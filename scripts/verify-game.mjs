@@ -41,13 +41,17 @@ for (const [name, cmd, args, env] of steps) {
 
 console.log('\n=== e2e ===');
 const spec = 'tests/e2e/games.spec.ts';
+const gameE2e = fs.readdirSync(path.join(root, 'src', 'games', id)).filter((f) => f.endsWith('.e2e.ts'));
 if (!fs.existsSync(path.join(root, spec))) console.log(`skipped: ${spec} does not exist yet`);
 else if (!(await chromiumInstalled())) console.log('skipped: chromium not installed (run `npx playwright install chromium`)');
 else {
-  const r = spawnSync(bin('npx'), ['playwright', 'test', spec, '-g', id], { cwd: root, stdio: 'inherit' });
-  if (r.status !== 0) {
-    console.error('\nverify:game failed at step "e2e"');
-    process.exit(r.status ?? 1);
+  const runs = [[spec, '-g', id], ...gameE2e.map((f) => [`src/games/${id}/${f}`])];
+  for (const args of runs) {
+    const r = spawnSync(bin('npx'), ['playwright', 'test', ...args], { cwd: root, stdio: 'inherit' });
+    if (r.status !== 0) {
+      console.error('\nverify:game failed at step "e2e"');
+      process.exit(r.status ?? 1);
+    }
   }
 }
 console.log(`\nverify:game ${id}: all steps passed`);
