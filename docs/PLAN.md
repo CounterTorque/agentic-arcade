@@ -2,6 +2,8 @@
 
 Status: proposed · Contract version: 1 · Owner: @CounterTorque
 
+> **Implementation status:** M0 (scaffold, CI), M1 (contract, runtime, test harness, scripts, template), M2 (Jump and shell UI), M3 (session and persistence) and the M4 documentation are implemented. The M4 multi-agent pilot has not been run. This plan is kept as the original design; see [architecture.md](architecture.md) for the as-built system and its deviations from this document.
+
 `[VERIFY]` marks a third-party detail to confirm at implementation time. Each one says how to check it.
 
 ---

@@ -4,7 +4,7 @@ You are working in **Agentic Arcade**, a static, WarioWare-style micro-game host
 
 **Most tasks are "add a mini-game".** A game is one directory, `src/games/<id>/`. Merging it to `main` publishes it automatically. You never edit any other file to register it.
 
-If your task is *not* adding or changing a game (framework, CI, docs), use a `framework/<topic>`, `ci/<topic>`, or `docs/<topic>` branch. Read `docs/architecture.md` first. Those PRs are for human review by @CounterTorque; do not self-merge them. Game PRs (`game/<id>`) you may merge yourself once CI is green.
+If your task is *not* adding or changing a game (framework, CI, docs), use a `framework/<topic>`, `ci/<topic>`, `docs/<topic>`, or `deps/<topic>` branch (the `scope` job rejects any other branch name). Read `docs/architecture.md` first. Those PRs are for human review by @CounterTorque; do not self-merge them. Game PRs (`game/<id>`) you may merge yourself once CI is green.
 
 ---
 
@@ -139,7 +139,7 @@ export default defineGame({
 
 ## 5. Conventions
 
-- **Split logic from rendering.** Put the simulation in a pure, DOM-free module (`logic.ts`: `createState`, `step`) and drawing in `render.ts` or `.svelte`. Unit-test the logic headlessly. See `src/games/jump/` as the reference.
+- **Split logic from rendering.** Put the simulation in a pure, DOM-free module (`logic.ts`: `createState`, `step`) and drawing in `render.ts` or `.svelte`. Unit-test the logic headlessly, and drive full rounds with `runEntry` and `makeGameEntry` from `tests/helpers/fake-host` (the template's `game.test.ts` shows how). See `src/games/jump/` as the reference.
 - **Everything time-based uses `frame.dt` / `frame.elapsed`.** Everything random uses `ctx.rng`. With the same seed and inputs, your game must play out identically.
 - **Make it winnable and losable at every `speed` × `level`.** The best test is a bot that always wins across many seeds, plus idle play that loses (or the reverse for `outcomeOnTimeout:'win'` games where idling should fail).
 - **Rendering:** DOM, SVG, Canvas 2D via `ctx.createCanvas()`, or Svelte components are all fine. If you `mount()` a Svelte component into `ctx.root`, `unmount()` it in `destroy()`.
@@ -156,13 +156,13 @@ export default defineGame({
 ## 6. Forbidden — CI will fail or the PR will be rejected
 
 - Changing any file outside `src/games/<id>/` on a game branch.
-- Adding or upgrading npm dependencies. Imports allowed: `@arcade/sdk`, `svelte`, `svelte/*`, and relative paths inside your directory. `*.test.ts` may also import `tests/helpers/**`.
+- Adding or upgrading npm dependencies. Imports allowed: `@arcade/sdk`, `svelte`, `svelte/*`, and relative paths inside your directory. `*.test.ts` may also import `vitest` and `tests/helpers/**`; `*.e2e.ts` may import `@playwright/test`.
 - Importing from `src/framework/`, `src/app/`, or another game.
 - `window`/`document` event listeners, `location`, `history`, `localStorage`, `sessionStorage`, `indexedDB`, `document.cookie`, `document.title`.
 - `requestAnimationFrame`, `setTimeout`, `setInterval`, `Date.now`, `performance.now`, `Math.random`.
 - Network access: `fetch`, `XMLHttpRequest`, `WebSocket`, remote fonts, images, or scripts.
 - Absolute paths like `'/img.png'`, or adding files to `public/`.
-- `eval`, `new Function`, or appending elements outside `ctx.root`.
+- `eval`, `new Function`, non-literal `import(...)`, `import.meta.glob`, or appending elements outside `ctx.root`.
 - Disabling lint rules (`eslint-disable`) or skipping or deleting tests to get green.
 - Self-merging a PR that touches framework paths.
 
@@ -170,7 +170,7 @@ export default defineGame({
 
 - [ ] Branch is `game/<id>`; the diff touches only `src/games/<id>/`.
 - [ ] `manifest.ts`, `index.ts`, `README.md`, and ≥ 1 `*.test.ts` exist.
-- [ ] `npm run verify:game -- <id>` passes locally: lint, typecheck, check:games, contract tests, unit tests, build, budget, and E2E if browsers are installed.
+- [ ] `npm run verify:game -- <id>` passes locally: lint, typecheck, check:games, contract tests, unit tests, build, budget, and E2E (`tests/e2e/games.spec.ts` for your game plus your own `*.e2e.ts`) if browsers are installed.
 - [ ] Played in `npm run dev` at speed 1 and speed 2.5 (`#/play/<id>?speed=2.5&level=3`). It can be won and lost, and nothing goes wrong in the browser console.
 - [ ] Outcome logic is correct: `ctx.resolve` is called for the game-decided outcome, and `outcomeOnTimeout` matches the design.
 - [ ] Respects `difficulty.speed` (and ideally `level`) and `ctx.reducedMotion`.
