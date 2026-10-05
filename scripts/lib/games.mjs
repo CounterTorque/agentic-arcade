@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export const ID_RE = /^[a-z][a-z0-9-]{1,30}$/;
+export const CONTROL_HINT_RE = /^[^(),]+ \([^()]+\)(, [^(),]+ \([^()]+\))*$/;
 export const VERB_RE = /^[A-Z][A-Z !?]{0,11}$/;
 export const ASSET_EXTS = ['.png', '.jpg', '.jpeg', '.webp', '.avif', '.gif', '.svg'];
 export const CODE_EXTS = ['.ts', '.js', '.mjs', '.svelte', '.css'];

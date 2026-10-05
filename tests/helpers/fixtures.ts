@@ -25,7 +25,7 @@ export function makeEntry(
       title: 'Inline',
       verb: 'GO!',
       description: 'Inline test game.',
-      author: 'tests',
+      controlHint: 'Space (Go)',
       controls: ['action'],
       baseDurationMs: 3000,
       outcomeOnTimeout: 'win',

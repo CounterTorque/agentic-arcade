@@ -6,7 +6,7 @@ export const manifest = defineManifest({
   title: 'Throws In Create',
   verb: 'GO!',
   description: 'Fixture game: throws-in-create.',
-  author: 'tests',
+  controlHint: 'Space (Go)',
   controls: ['action'],
   baseDurationMs: 3000,
   outcomeOnTimeout: 'win',

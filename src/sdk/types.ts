@@ -22,10 +22,11 @@ export interface GameManifest {
   verb: string;
   /** ≤ 140 chars, shown in the gallery. */
   description: string;
-  /** Agent/model or human who authored it, e.g. "devin". */
-  author: string;
-  /** Which inputs the game reads. Non-empty. Shown as control hints. */
+  /** Which inputs the game reads. Non-empty. Declared input intent. */
   controls: readonly ControlScheme[];
+  /** Short player-facing controls line: keys/buttons, then the action in parentheses,
+   *  e.g. 'Space/Click (Jump)' or 'Arrows (Move), Space (Fire)'. ≤ 48 chars. */
+  controlHint: string;
   /** Round length at speed 1.0, integer ms in [3000, 8000]. Host scales it. */
   baseDurationMs: number;
   /** Result if the timer expires before the game calls resolve(). */

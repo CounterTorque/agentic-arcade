@@ -6,11 +6,11 @@ import { scaffoldGame } from './lib/scaffold.mjs';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { values, positionals } = parseArgs({
   allowPositionals: true,
-  options: { title: { type: 'string' }, verb: { type: 'string' }, author: { type: 'string' } },
+  options: { title: { type: 'string' }, verb: { type: 'string' }, controls: { type: 'string' } },
 });
 const id = positionals[0];
 if (!id) {
-  console.error('usage: npm run new:game -- <id> [--title "Title"] [--verb "VERB!"] [--author name]');
+  console.error('usage: npm run new:game -- <id> [--title "Title"] [--verb "VERB!"] [--controls "Space/Click (Action)"]');
   process.exit(2);
 }
 try {

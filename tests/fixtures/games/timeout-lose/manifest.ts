@@ -6,7 +6,7 @@ export const manifest = defineManifest({
   title: 'Timeout Lose',
   verb: 'GO!',
   description: 'Fixture game: timeout-lose.',
-  author: 'tests',
+  controlHint: 'Space (Go)',
   controls: ['action'],
   baseDurationMs: 3000,
   outcomeOnTimeout: 'lose',

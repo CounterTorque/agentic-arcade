@@ -6,7 +6,7 @@ export const manifest = defineManifest({
   title: 'Leaky',
   verb: 'GO!',
   description: 'Fixture game: leaky.',
-  author: 'tests',
+  controlHint: 'Space (Go)',
   controls: ['action'],
   baseDurationMs: 3000,
   outcomeOnTimeout: 'win',

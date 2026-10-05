@@ -6,7 +6,7 @@ export const manifest = defineManifest({
   title: 'Nondeterministic',
   verb: 'GO!',
   description: 'Fixture game: nondeterministic.',
-  author: 'tests',
+  controlHint: 'Space (Go)',
   controls: ['action'],
   baseDurationMs: 3000,
   outcomeOnTimeout: 'win',

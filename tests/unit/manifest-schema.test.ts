@@ -7,7 +7,7 @@ const valid = {
   title: 'My Game',
   verb: 'JUMP!',
   description: 'desc',
-  author: 'me',
+  controlHint: 'Space/Click (Jump)',
   controls: ['action'],
   baseDurationMs: 5000,
   outcomeOnTimeout: 'win',
@@ -18,6 +18,7 @@ describe('validateManifest', () => {
   it('accepts a valid manifest', () => {
     expect(errs({})).toEqual([]);
     expect(errs({ tags: ['a', 'b-c'], enabled: false })).toEqual([]);
+    expect(errs({ controlHint: 'Arrows (Move), Space (Fire)' })).toEqual([]);
   });
 
   it.each([
@@ -35,7 +36,12 @@ describe('validateManifest', () => {
     ['long verb', { verb: 'ABCDEFGHIJKLM' }],
     ['empty description', { description: ' ' }],
     ['long description', { description: 'x'.repeat(141) }],
-    ['empty author', { author: '' }],
+    ['missing controlHint', { controlHint: undefined }],
+    ['empty controlHint', { controlHint: '' }],
+    ['too long controlHint', { controlHint: `Space (${'x'.repeat(48)})` }],
+    ['controlHint without parentheses', { controlHint: 'Arrows' }],
+    ['controlHint with empty parentheses', { controlHint: 'Arrows ()' }],
+    ['controlHint without a key before parentheses', { controlHint: '(Move)' }],
     ['no controls', { controls: [] }],
     ['unknown control', { controls: ['keyboard'] }],
     ['duplicate controls', { controls: ['action', 'action'] }],
@@ -48,6 +54,12 @@ describe('validateManifest', () => {
     ['enabled type', { enabled: 'yes' }],
   ])('rejects %s', (_n, patch) => {
     expect(errs(patch).length).toBeGreaterThan(0);
+  });
+});
+
+describe('controlHint message', () => {
+  it('shows the expected format with an example', () => {
+    expect(errs({ controlHint: 'Arrows' }).join(' ')).toContain("e.g. 'Space/Click (Jump)'");
   });
 });
 

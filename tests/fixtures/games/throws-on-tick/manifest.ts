@@ -6,7 +6,7 @@ export const manifest = defineManifest({
   title: 'Throws On Tick',
   verb: 'GO!',
   description: 'Fixture game: throws-on-tick.',
-  author: 'tests',
+  controlHint: 'Space (Go)',
   controls: ['action'],
   baseDurationMs: 3000,
   outcomeOnTimeout: 'win',

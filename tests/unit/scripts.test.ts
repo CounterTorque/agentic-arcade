@@ -155,12 +155,17 @@ describe('check-games and template', () => {
     scaffoldGame({ root, id: 'ok-game' });
     expect(() => scaffoldGame({ root, id: 'ok-game' })).toThrow(/already exists/);
     expect(() => scaffoldGame({ root, id: 'other-game', verb: 'lower' })).toThrow();
+    expect(() => scaffoldGame({ root, id: 'other-game', controls: 'Arrows' })).toThrow(/controls must be/);
+    expect(fs.existsSync(path.join(root, 'src', 'games', 'other-game'))).toBe(false);
   });
 
   it('scaffolds a game that passes check-games and the contract suite', async () => {
     const root = tmpRoot();
-    const dir = scaffoldGame({ root, id: 'tpl-probe', title: 'Tpl Probe', verb: 'TAP!' });
-    expect(fs.readFileSync(path.join(dir, 'manifest.ts'), 'utf8')).toContain("id: 'tpl-probe'");
+    const dir = scaffoldGame({ root, id: 'tpl-probe', title: 'Tpl Probe', verb: 'TAP!', controls: 'Arrows (Move)' });
+    const manifestSource = fs.readFileSync(path.join(dir, 'manifest.ts'), 'utf8');
+    expect(manifestSource).toContain("id: 'tpl-probe'");
+    expect(manifestSource).toContain("controlHint: 'Arrows (Move)'");
+    expect(manifestSource).not.toContain('__');
     expect(fs.existsSync(path.join(dir, 'assets', '.gitkeep'))).toBe(true);
     expect(checkGames({ root, only: 'tpl-probe' })).toMatchObject({ errors: [], checked: ['tpl-probe'] });
 

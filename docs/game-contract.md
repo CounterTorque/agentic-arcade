@@ -22,8 +22,8 @@ src/games/<id>/
 | `title` | 1-24 chars; unique across games (case-insensitive) |
 | `verb` | `/^[A-Z][A-Z !?]{0,11}$/`, flashed before play |
 | `description` | 1-140 chars |
-| `author` | non-empty |
-| `controls` | non-empty, no duplicates, subset of `action`, `directions`, `pointer` |
+| `controls` | non-empty, no duplicates, subset of `action`, `directions`, `pointer`; the declared input intent (not shown to players) |
+| `controlHint` | required, 1-48 chars, player-facing controls line shown in the gallery: `<keys> (<action>)`, comma-separated, e.g. `Space/Click (Jump)` or `Arrows (Move), Space (Fire)`; matches `/^[^(),]+ \([^()]+\)(, [^(),]+ \([^()]+\))*$/` |
 | `baseDurationMs` | integer 3000-8000; host divides by speed (minimum 2000) |
 | `outcomeOnTimeout` | `'win'` (survive games) or `'lose'` (do-it games) |
 | `tags` | optional, at most 5 kebab-case strings |
@@ -126,3 +126,4 @@ it('wins when the action is pressed', async () => {
 ## Changelog
 
 - **v1** - initial contract.
+- **v1 amendment:** removed `author`, added required `controlHint` (made before any external game existed, so the contract version stays 1).

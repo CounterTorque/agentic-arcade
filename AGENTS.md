@@ -30,7 +30,7 @@ git switch -c game/<id> origin/main
 npm ci
 
 # 3. Scaffold from the template (creates src/games/<id>/ with manifest, index, test, README)
-npm run new:game -- <id>
+npm run new:game -- <id> --title "Title" --verb "DODGE!" --controls "Arrows (Move)"
 
 # 4. Implement (see sections 3–5), and play it:
 npm run dev
@@ -83,13 +83,15 @@ export const manifest = defineManifest({
   title: 'Title',              // 1–24 chars, unique across games
   verb: 'DODGE!',              // /^[A-Z][A-Z !?]{0,11}$/ — flashed before play
   description: '…',            // ≤ 140 chars
-  author: '<agent or model name>',
   controls: ['action'],        // any of 'action' | 'directions' | 'pointer'
+  controlHint: 'Space/Click (Jump)', // REQUIRED: keys/buttons + (action), ≤ 48 chars
   baseDurationMs: 5000,        // integer 3000–8000 (host divides by speed, min 2000)
   outcomeOnTimeout: 'win',     // 'win' = survive games, 'lose' = must-do-it games
   tags: ['reflex'],            // optional, ≤ 5 kebab-case
 });
 ```
+
+`controlHint` is required for publishing: it is the controls line players see in the gallery, so it must name the real inputs and the action they perform (`Space/Click (Jump)`, `Arrows (Move), Space (Fire)`). Format: `<keys> (<action>)`, comma-separated, ≤ 48 chars; `npm run new:game` and the manifest validator reject anything else.
 
 ### Module
 
@@ -173,6 +175,7 @@ export default defineGame({
 - [ ] `npm run verify:game -- <id>` passes locally: lint, typecheck, check:games, contract tests, unit tests, build, budget, and E2E (`tests/e2e/games.spec.ts` for your game plus your own `*.e2e.ts`) if browsers are installed.
 - [ ] Played in `npm run dev` at speed 1 and speed 2.5 (`#/play/<id>?speed=2.5&level=3`). It can be won and lost, and nothing goes wrong in the browser console.
 - [ ] Outcome logic is correct: `ctx.resolve` is called for the game-decided outcome, and `outcomeOnTimeout` matches the design.
+- [ ] `controlHint` accurately describes the inputs and action, e.g. `Space/Click (Jump)`.
 - [ ] Respects `difficulty.speed` (and ideally `level`) and `ctx.reducedMotion`.
 - [ ] PR opened with the template filled in; CI `scope`, `verify`, and `e2e` are green.
 - [ ] Squash-merged. After `Deploy` finishes, the game appears at https://countertorque.github.io/agentic-arcade/#/gallery.
@@ -182,7 +185,7 @@ export default defineGame({
 | Command | Purpose |
 |---|---|
 | `npm run dev` | Dev server at `http://localhost:3456/agentic-arcade/` |
-| `npm run new:game -- <id>` | Scaffold a game from `templates/game/` |
+| `npm run new:game -- <id> [--title T] [--verb V!] [--controls "Keys (Action)"]` | Scaffold a game from `templates/game/` |
 | `npm run verify:game -- <id>` | Full local gate for one game |
 | `GAME=<id> npx vitest run tests/contract` | Contract suite for one game only |
 | `npx vitest run src/games/<id>` | Your unit tests |

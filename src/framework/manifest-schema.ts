@@ -3,6 +3,7 @@ import type { GameManifest } from '@arcade/sdk';
 const ID_RE = /^[a-z][a-z0-9-]{1,30}$/;
 const VERB_RE = /^[A-Z][A-Z !?]{0,11}$/;
 const TAG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+export const CONTROL_HINT_RE = /^[^(),]+ \([^()]+\)(, [^(),]+ \([^()]+\))*$/;
 const CONTROLS = ['action', 'directions', 'pointer'];
 
 export function validateManifest(m: unknown, dir: string): string[] {
@@ -18,7 +19,8 @@ export function validateManifest(m: unknown, dir: string): string[] {
   if (!isStr(o.verb) || !VERB_RE.test(o.verb)) errors.push(`verb must match ${VERB_RE}`);
   if (!isStr(o.description) || o.description.trim() === '' || o.description.length > 140)
     errors.push('description must be 1-140 characters');
-  if (!isStr(o.author) || o.author.trim() === '') errors.push('author must be a non-empty string');
+  if (!isStr(o.controlHint) || o.controlHint.length < 1 || o.controlHint.length > 48 || !CONTROL_HINT_RE.test(o.controlHint))
+    errors.push("controlHint must be 1-48 chars: keys/buttons then the action in parentheses, e.g. 'Space/Click (Jump)' or 'Arrows (Move), Space (Fire)'");
   if (!Array.isArray(o.controls) || o.controls.length === 0) errors.push('controls must be a non-empty array');
   else {
     if (o.controls.some((c) => !CONTROLS.includes(c))) errors.push(`controls must be a subset of ${CONTROLS.join(', ')}`);

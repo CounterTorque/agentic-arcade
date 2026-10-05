@@ -23,8 +23,7 @@
           <div class="verb">{m.verb}</div>
           <p>{m.description}</p>
           <dl>
-            <div><dt>Author</dt><dd>{m.author}</dd></div>
-            <div><dt>Controls</dt><dd>{m.controls.join(', ')}</dd></div>
+            <div><dt>Controls</dt><dd>{m.controlHint}</dd></div>
           </dl>
           {#if m.tags?.length}
             <div class="tags">{#each m.tags as t (t)}<span>{t}</span>{/each}</div>

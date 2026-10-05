@@ -6,7 +6,7 @@ export const manifest = defineManifest({
   title: 'Always Win',
   verb: 'GO!',
   description: 'Fixture game: always-win.',
-  author: 'tests',
+  controlHint: 'Space (Go)',
   controls: ['action'],
   baseDurationMs: 3000,
   outcomeOnTimeout: 'win',
