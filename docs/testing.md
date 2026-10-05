@@ -11,7 +11,9 @@
 | E2E per game | `tests/e2e/games.spec.ts` | `npm run test:e2e` | one test per `src/games/<dir>` with a `manifest.ts`: opens `#/play/<id>?seed=1`, waits for `__ARCADE__.lastRound`, asserts `kind !== 'error'` and no page or console errors, attaches a mid-round screenshot |
 | E2E game-specific | `src/games/<id>/*.e2e.ts` | `npm run test:e2e` | optional, e.g. Jump idle -> `lose` |
 
-Unit tests run in Vitest with jsdom and a no-op 2D canvas (`tests/setup/canvas-stub.ts`). E2E needs `npx playwright install chromium`; Playwright builds nothing, so run `npm run build` first (CI does). It serves `dist/` with `vite preview` on port 4173 at `/agentic-arcade/`.
+Unit tests run in Vitest with jsdom and a no-op 2D canvas (`tests/setup/canvas-stub.ts`). E2E needs `npx playwright install chromium`; Playwright builds nothing, so run `npm run build` first (CI does). It serves `dist/` with `vite preview` on port 3457 at `/agentic-arcade/`.
+
+Ports: `npm run dev` and `npm run preview` use 3456; Playwright starts its own preview server on 3457, so a running dev server does not collide with E2E. Only stop processes this repository started; never kill node/vite processes by name or in bulk. See [AGENTS.md section 9](../AGENTS.md#9-local-servers-and-processes).
 
 ## Commands
 

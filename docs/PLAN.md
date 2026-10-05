@@ -912,7 +912,7 @@ The site is served from `https://countertorque.github.io/agentic-arcade/`, not f
 - `base: '/agentic-arcade/'` is required. Without it, every asset 404s on Pages and the page renders blank.
 - **Asset paths:** anything imported through ES modules gets the base prefix automatically. Hard-coded `/foo.png` strings and `public/` references don't (games are banned from both; framework code uses `import.meta.env.BASE_URL`).
 - **Routing:** there's no server-side fallback, so deep links like `/agentic-arcade/play/jump` 404. Hash routing avoids this.
-- **Previewing locally:** `vite preview` serves under the base too. Playwright's `baseURL` is `http://localhost:4173/agentic-arcade/`.
+- **Previewing locally:** `vite preview` serves under the base too. Playwright's `baseURL` is `http://localhost:3457/agentic-arcade/`.
 - **If the repo is renamed or a custom domain is added**, `base` must change (R5).
 - **One-time setup:** Settings → Pages → Source = "GitHub Actions" (manual, see `docs/deployment.md`).
 

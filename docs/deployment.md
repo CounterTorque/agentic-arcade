@@ -12,7 +12,7 @@ Pages serves a project site under `/agentic-arcade/`, so `vite.config.ts` sets `
 
 - Assets imported through ES modules get the prefix automatically. Hard-coded `/foo.png` strings and `public/` files do not, which is why games may not use them. Framework code uses `import.meta.env.BASE_URL`.
 - Routing is hash-based (`#/play/jump`) because Pages has no SPA fallback for deep links.
-- `vite preview` and the E2E `baseURL` (`http://localhost:4173/agentic-arcade/`) use the same base.
+- `vite preview` and the E2E `baseURL` (`http://localhost:3457/agentic-arcade/`) use the same base.
 - **If the repository is renamed or a custom domain is added, change `base`** (and the E2E `baseURL`/webServer URL in `playwright.config.ts`).
 
 ## Workflows
@@ -59,5 +59,5 @@ Revert the squash commit on `main` (through a PR) and merge it; `deploy.yml` reb
 
 ```bash
 npm run build
-npm run preview -- --port 4173      # http://localhost:4173/agentic-arcade/
+npm run preview -- --port 3456      # http://localhost:3456/agentic-arcade/
 ```

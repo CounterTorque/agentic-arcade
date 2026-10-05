@@ -23,7 +23,7 @@ Requirements: Node as pinned in `.nvmrc` (`nvm use`) and npm.
 
 ```bash
 npm ci
-npm run dev        # http://localhost:5173/agentic-arcade/
+npm run dev        # http://localhost:3456/agentic-arcade/
 npm run verify     # lint, typecheck, check:games, tests, build, check:budget
 npx playwright install chromium   # once
 npm run build && npm run test:e2e

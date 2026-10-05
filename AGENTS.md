@@ -34,7 +34,7 @@ npm run new:game -- <id>
 
 # 4. Implement (see sections 3–5), and play it:
 npm run dev
-#    open http://localhost:5173/agentic-arcade/#/play/<id>?seed=1
+#    open http://localhost:3456/agentic-arcade/#/play/<id>?seed=1
 #    try speeds/levels: #/play/<id>?seed=1&speed=2.5&level=3
 
 # 5. Run the full gate for your game — must pass with zero errors
@@ -181,7 +181,7 @@ export default defineGame({
 
 | Command | Purpose |
 |---|---|
-| `npm run dev` | Dev server at `http://localhost:5173/agentic-arcade/` |
+| `npm run dev` | Dev server at `http://localhost:3456/agentic-arcade/` |
 | `npm run new:game -- <id>` | Scaffold a game from `templates/game/` |
 | `npm run verify:game -- <id>` | Full local gate for one game |
 | `GAME=<id> npx vitest run tests/contract` | Contract suite for one game only |
@@ -190,7 +190,22 @@ export default defineGame({
 | `npx playwright test tests/e2e/games.spec.ts -g <id>` | Browser smoke test for your game (`npx playwright install chromium` first) |
 | `npm run verify` | Full repo gate (framework work) |
 
-## 9. When something fails
+## 9. Local servers and processes
+
+- This app's ports: **3456** for `npm run dev` and `npm run preview`, and **3457** for the preview server Playwright starts for E2E. Both use a strict port: if the port is busy, the command fails instead of moving to another port.
+- Other Svelte, Vite or Node apps on this machine belong to other projects. **Never** stop processes by name or in bulk: no `pkill node`, `pkill -f vite`, `pkill -f svelte`, `killall node`, and no `kill-port` on any port other than 3456 or 3457.
+- Stop only what this repository started:
+  1. Prefer stopping the process you launched yourself (Ctrl-C, or kill the PID or shell you started).
+  2. If 3456 or 3457 is busy, find the listener and confirm it belongs to this repo before stopping it:
+     ```bash
+     lsof -nP -iTCP:3456 -sTCP:LISTEN         # note the PID
+     lsof -a -p <PID> -d cwd -Fn | tail -1    # must end with this repo's path
+     kill <PID>                               # only if the path matches
+     ```
+  3. If the listener belongs to another project, leave it running and report that the port is taken.
+- Playwright starts and stops its own server on 3457, so a dev server on 3456 can keep running during E2E.
+
+## 10. When something fails
 
 - **`scope` failed:** you changed a file outside your directory. Revert it.
 - **Contract "hygiene" failure:** you used a forbidden global (timer, rAF, `Math.random`, or a window listener). Use `frame.dt`, `ctx.rng`, and listeners on elements inside `ctx.root` with `{ signal: ctx.signal }`.

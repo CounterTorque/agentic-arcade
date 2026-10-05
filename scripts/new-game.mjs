@@ -15,7 +15,7 @@ if (!id) {
 }
 try {
   const dir = scaffoldGame({ root, id, ...values });
-  console.log(`created ${path.relative(root, dir)}/\nnext: npm run dev, then open http://localhost:5173/agentic-arcade/#/play/${id}?seed=1`);
+  console.log(`created ${path.relative(root, dir)}/\nnext: npm run dev, then open http://localhost:3456/agentic-arcade/#/play/${id}?seed=1`);
 } catch (e) {
   console.error(`error: ${e.message}`);
   process.exit(1);
