@@ -6,9 +6,24 @@
 
   let areaWidth = $state(0);
   let areaHeight = $state(0);
+  let areaEl: HTMLDivElement | undefined = $state();
   let rootEl: HTMLDivElement | undefined = $state();
 
-  const scale = $derived(Math.max(0.1, Math.min(areaWidth / STAGE_WIDTH, areaHeight / STAGE_HEIGHT)));
+  const scale = $derived(Math.max(0.1, Math.floor(Math.min(areaWidth / STAGE_WIDTH, areaHeight / STAGE_HEIGHT) * 1000) / 1000));
+
+  $effect(() => {
+    if (!areaEl) return;
+    const el = areaEl;
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      areaWidth = r.width;
+      areaHeight = r.height;
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  });
 
   export function getRoot(): HTMLDivElement {
     return rootEl!;
@@ -19,7 +34,7 @@
   }
 </script>
 
-<div class="area" bind:clientWidth={areaWidth} bind:clientHeight={areaHeight}>
+<div class="area" bind:this={areaEl}>
   <div class="frame" style:width="{STAGE_WIDTH * scale}px" style:height="{STAGE_HEIGHT * scale}px" data-testid="stage">
     <div class="root" bind:this={rootEl} style:transform="scale({scale})"></div>
     <div class="overlay" style:transform="scale({scale})">

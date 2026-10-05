@@ -38,6 +38,20 @@ test('practice shows a not-found page for unknown ids', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test.describe('stage fit', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('the whole stage is visible inside the available area', async ({ page }) => {
+    await page.goto('./#/play/jump?seed=1');
+    const stage = (await page.getByTestId('stage').boundingBox())!;
+    const main = (await page.locator('main').boundingBox())!;
+    expect(stage.y + stage.height).toBeLessThanOrEqual(main.y + main.height);
+    expect(stage.x + stage.width).toBeLessThanOrEqual(main.x + main.width);
+    expect(stage.width / stage.height).toBeCloseTo(4 / 3, 1);
+    await page.screenshot({ path: '/tmp/arcade-shots/stage-1280x800.png' });
+  });
+});
+
 test('Esc pauses a round and resumes it', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('./#/play/jump?seed=1');
