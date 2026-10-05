@@ -1,38 +1,79 @@
-<main>
-  <h1>Agentic Arcade</h1>
-  <div class="viewport">
-    <div class="stage" data-testid="stage"></div>
-  </div>
-</main>
+<script lang="ts">
+  import { router } from './router.svelte';
+  import Gallery from './routes/Gallery.svelte';
+  import Lobby from './routes/Lobby.svelte';
+  import Practice from './routes/Practice.svelte';
+  import Session from './routes/Session.svelte';
+
+  const route = $derived(router.route);
+</script>
+
+<div class="shell">
+  <header>
+    <a class="brand" href="#/">Agentic Arcade</a>
+    <nav>
+      <a href="#/session">Play</a>
+      <a href="#/gallery">Gallery</a>
+    </nav>
+  </header>
+  <main>
+    {#key route.key}
+      {#if route.name === 'session'}
+        <Session query={route.query} />
+      {:else if route.name === 'practice'}
+        <Practice id={route.id!} query={route.query} />
+      {:else if route.name === 'gallery'}
+        <Gallery />
+      {:else}
+        <Lobby />
+      {/if}
+    {/key}
+  </main>
+</div>
 
 <style>
-  main {
+  .shell {
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    box-sizing: border-box;
-    padding: 0.5rem 1rem 1rem;
   }
 
-  h1 {
-    margin: 0 0 0.5rem;
-    font-size: 1.25rem;
-    text-align: center;
+  header {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.35rem 1rem;
+    background: #0b0d14;
+    border-bottom: 1px solid #1c2033;
   }
 
-  .viewport {
+  .brand {
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    color: #ffd166;
+    text-decoration: none;
+  }
+
+  nav {
+    display: flex;
+    gap: 1rem;
+  }
+
+  nav a {
+    color: #c7cde6;
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: #fff;
+  }
+
+  main {
     flex: 1;
     min-height: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .stage {
-    aspect-ratio: 4 / 3;
-    width: min(100%, calc((100vh - 5rem) * 4 / 3));
-    background: #000;
-    border: 2px solid #2a2f45;
-    box-sizing: border-box;
+    flex-direction: column;
+    overflow: auto;
   }
 </style>
