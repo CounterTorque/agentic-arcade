@@ -41,6 +41,18 @@ describe('RafClock', () => {
     clock.dispose();
   });
 
+  it('reports pause changes once per transition', () => {
+    const clock = new RafClock();
+    const seen: boolean[] = [];
+    clock.onPausedChange = (p) => seen.push(p);
+    clock.pause();
+    clock.pause();
+    clock.resume();
+    clock.resume();
+    expect(seen).toEqual([true, false]);
+    clock.dispose();
+  });
+
   it('does not step while paused and resumes', async () => {
     const clock = new RafClock();
     let n = 0;

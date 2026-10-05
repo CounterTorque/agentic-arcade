@@ -96,6 +96,29 @@ describe('runRound', () => {
     host.dispose();
   });
 
+  it('calls onFrame after each tick in play and settle', async () => {
+    const seen: string[] = [];
+    const ticks: string[] = [];
+    const entry = makeEntry(
+      game((c) => ({
+        tick: (f) => {
+          ticks.push(f.phase);
+          if (f.phase === 'play' && f.elapsed > 100) c.resolve('win');
+        },
+      })),
+    );
+    const host = createFakeHost();
+    await runRound({
+      entry, root: host.root, difficulty: { speed: 1, level: 1, round: 0 }, seed: 1, clock: host.clock, input: host.input,
+      onFrame: (f) => seen.push(`${f.phase}:${ticks.length}`),
+    });
+    expect(seen).toHaveLength(ticks.length);
+    expect(seen.some((s) => s.startsWith('play'))).toBe(true);
+    expect(seen.some((s) => s.startsWith('settle'))).toBe(true);
+    expect(seen.at(-1)).toBe(`settle:${ticks.length}`);
+    host.dispose();
+  });
+
   it('reports phases in order', async () => {
     const phases: LifecyclePhase[] = [];
     await runEntry(fixture('always-win'), { onPhase: (p) => phases.push(p) });

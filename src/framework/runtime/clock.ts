@@ -8,6 +8,7 @@ const MAX_FRAMES = 100_000;
 
 export class RafClock implements Clock {
   paused = false;
+  onPausedChange?: (paused: boolean) => void;
   private cancel: (() => void) | null = null;
   private resumeLoop: (() => void) | null = null;
   private readonly onVisibility = () => {
@@ -19,12 +20,15 @@ export class RafClock implements Clock {
   }
 
   pause(): void {
+    if (this.paused) return;
     this.paused = true;
+    this.onPausedChange?.(true);
   }
 
   resume(): void {
     if (!this.paused) return;
     this.paused = false;
+    this.onPausedChange?.(false);
     this.resumeLoop?.();
   }
 

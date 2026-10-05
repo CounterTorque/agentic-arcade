@@ -2,6 +2,7 @@ import {
   STAGE_HEIGHT,
   STAGE_WIDTH,
   type Difficulty,
+  type FrameInfo,
   type GameContext,
   type GameInstance,
   type LifecyclePhase,
@@ -34,6 +35,7 @@ export interface RunRoundOptions {
   reducedMotion?: boolean;
   loadImage?: (url: string, signal: AbortSignal) => Promise<HTMLImageElement>;
   onPhase?: (p: LifecyclePhase) => void;
+  onFrame?: (frame: FrameInfo) => void;
   settleMs?: number;
   preloadTimeoutMs?: number;
 }
@@ -167,8 +169,10 @@ export async function runRound(o: RunRoundOptions): Promise<RoundResult> {
         lastScale = scale();
         for (const c of canvases) c.resize();
       }
-      instance!.tick({ dt, elapsed, remaining, phase: 'play' });
+      const frame: FrameInfo = { dt, elapsed, remaining, phase: 'play' };
+      instance!.tick(frame);
       o.input.endFrame();
+      o.onFrame?.(frame);
       if (!resolved && remaining === 0) resolved = { outcome: entry.manifest.outcomeOnTimeout, via: 'timeout' };
       return !resolved;
     }, external);
@@ -184,8 +188,10 @@ export async function runRound(o: RunRoundOptions): Promise<RoundResult> {
     await o.clock.run((dt) => {
       if (cancelled()) return false;
       settle += dt;
-      instance!.tick({ dt, elapsed, remaining: 0, phase: 'settle' });
+      const frame: FrameInfo = { dt, elapsed, remaining: 0, phase: 'settle' };
+      instance!.tick(frame);
       o.input.endFrame();
+      o.onFrame?.(frame);
       return settle < settleMs;
     }, external);
     checkCancelled();
