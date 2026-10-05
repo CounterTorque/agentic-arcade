@@ -29,6 +29,8 @@ src/games/<id>/
 | `tags` | optional, at most 5 kebab-case strings |
 | `enabled` | optional boolean; `false` keeps a WIP game out of sessions (still in the gallery) |
 
+The runner ticks the game before applying the timeout, so a `ctx.resolve()` made in the tick where `frame.remaining === 0` counts as a game result (`via: 'game'`); `outcomeOnTimeout` only applies if the game has not resolved by then.
+
 ## Module hooks
 
 | Hook | Required | When | Notes |
