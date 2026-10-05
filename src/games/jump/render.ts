@@ -10,7 +10,7 @@ const LANE_DASH = 60;
 const LANE_GAP = 50;
 const SCROLL_SPEED = 520;
 
-export function createRenderer(ctx: GameContext, assets: { player: HTMLImageElement }) {
+export function createRenderer(ctx: GameContext, assets: { player: HTMLImageElement; shocked: HTMLImageElement }) {
   const { g } = ctx.createCanvas();
   const roadY = GROUND_Y;
   const laneY = GROUND_Y + (STAGE_HEIGHT - GROUND_Y) / 2;
@@ -68,7 +68,7 @@ export function createRenderer(ctx: GameContext, assets: { player: HTMLImageElem
     g.ellipse(PLAYER.x + PLAYER.w / 2, GROUND_Y + 2, (PLAYER.w / 2) * shadow, 6 * shadow, 0, 0, Math.PI * 2);
     g.fill();
     g.globalAlpha = s.status === 'hit' ? 0.85 : 1;
-    g.drawImage(assets.player, PLAYER.x, py, PLAYER.w, PLAYER.h);
+    g.drawImage(s.status === 'hit' || pose === 'shocked' ? assets.shocked : assets.player, PLAYER.x, py, PLAYER.w, PLAYER.h);
     g.globalAlpha = 1;
     g.textAlign = 'center';
     if (s.status === 'hit' || pose === 'shocked') {

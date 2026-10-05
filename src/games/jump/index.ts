@@ -1,5 +1,6 @@
 import { defineGame } from '@arcade/sdk';
 import playerUrl from './assets/player.svg';
+import shockedUrl from './assets/player-shocked.svg';
 import { createState, step } from './logic';
 import { createRenderer } from './render';
 
@@ -7,7 +8,8 @@ export default defineGame({
   contractVersion: 1,
 
   async preload({ loadImage }) {
-    return { player: await loadImage(playerUrl) };
+    const [player, shocked] = await Promise.all([loadImage(playerUrl), loadImage(shockedUrl)]);
+    return { player, shocked };
   },
 
   create(ctx, assets) {
