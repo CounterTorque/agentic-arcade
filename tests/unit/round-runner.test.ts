@@ -57,6 +57,18 @@ describe('runRound', () => {
     expect(ctx.resolved).toBe('lose');
   });
 
+  it('counts a resolve made in the tick where remaining hits 0', async () => {
+    const entry = makeEntry(
+      game((c) => ({
+        tick: (f) => {
+          if (f.phase === 'play' && f.remaining === 0) c.resolve('win');
+        },
+      })),
+      { outcomeOnTimeout: 'lose' },
+    );
+    expect(await runEntry(entry)).toMatchObject({ kind: 'win', via: 'game' });
+  });
+
   it('ignores resolve outside play (create, start, settle)', async () => {
     const entry = makeEntry(
       game((c) => {
