@@ -10,7 +10,7 @@ export default defineConfig({
     // Svelte 5 resolves to its server build under Vitest unless the browser condition is set.
     conditions: process.env.VITEST ? ['browser'] : undefined,
   },
-  server: { port: 3456, strictPort: true },
+  server: { port: 3456, strictPort: true, watch: { ignored: ['**/playwright-report/**', '**/test-results/**'] } },
   preview: { port: 3456, strictPort: true },
   build: { manifest: true, target: 'es2022' },
   test: {
