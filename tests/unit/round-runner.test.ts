@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { GameContext, GameInstance, LifecyclePhase, MicroGame } from '@arcade/sdk';
-import { INTRO_MS, SETTLE_MS } from '../../src/framework/runtime/round-runner';
+import { INTRO_MS, SETTLE_MS, runRound } from '../../src/framework/runtime/round-runner';
 import { createFakeHost, runEntry } from '../helpers/fake-host';
 import { fixture, makeEntry } from '../helpers/fixtures';
 
@@ -130,6 +130,118 @@ describe('runRound', () => {
     });
     await runEntry(entry);
     expect((assets as { img: unknown }).img).toBeInstanceOf(Image);
+  });
+
+  describe('cancellation', () => {
+    const abortName = async (p: Promise<unknown>) => ((await p.catch((e) => e)) as DOMException).name;
+
+    it('rejects with AbortError when aborted during preload, and tears down', async () => {
+      const ac = new AbortController();
+      let created = false;
+      const entry = makeEntry({ contractVersion: 1, preload: () => new Promise(() => {}), create: () => ((created = true), { tick() {} }) });
+      const host = createFakeHost();
+      host.root.append('x');
+      const run = runRound({ entry, root: host.root, difficulty: { speed: 1, level: 1, round: 0 }, seed: 1, clock: host.clock, input: host.input, signal: ac.signal });
+      queueMicrotask(() => ac.abort());
+      expect(await abortName(run)).toBe('AbortError');
+      expect(created).toBe(false);
+      expect(host.root.childNodes.length).toBe(0);
+      host.dispose();
+    });
+
+    it('aborts an in-flight preload image load', async () => {
+      const ac = new AbortController();
+      let imageSignal!: AbortSignal;
+      const entry = makeEntry({
+        contractVersion: 1,
+        preload: (p) => p.loadImage('x.png'),
+        create: () => ({ tick() {} }),
+      });
+      const host = createFakeHost();
+      const run = runRound({
+        entry, root: host.root, difficulty: { speed: 1, level: 1, round: 0 }, seed: 1, clock: host.clock, input: host.input,
+        signal: ac.signal,
+        loadImage: (_u, s) => ((imageSignal = s), new Promise(() => {})),
+      });
+      await new Promise((r) => setTimeout(r, 0));
+      ac.abort();
+      expect(await abortName(run)).toBe('AbortError');
+      expect(imageSignal.aborted).toBe(true);
+      host.dispose();
+    });
+
+    it('aborts during play: destroys once, aborts ctx.signal, empties root', async () => {
+      const ac = new AbortController();
+      const calls: string[] = [];
+      let ctx!: GameContext;
+      const entry = makeEntry(
+        game((c) => {
+          ctx = c;
+          c.root.append('x');
+          return {
+            tick: (f) => {
+              if (f.elapsed > 200) ac.abort();
+            },
+            end: () => void calls.push('end'),
+            destroy: () => void calls.push('destroy'),
+          };
+        }),
+      );
+      const host = createFakeHost();
+      const run = runEntry(entry, { host, signal: ac.signal });
+      expect(await abortName(run)).toBe('AbortError');
+      expect(calls).toEqual(['destroy']);
+      expect(ctx.signal.aborted).toBe(true);
+      expect(host.root.childNodes.length).toBe(0);
+      host.dispose();
+    });
+
+    it('aborts during settle', async () => {
+      const ac = new AbortController();
+      const calls: string[] = [];
+      const entry = makeEntry(
+        game((c) => ({
+          tick: (f) => {
+            if (f.phase === 'play') c.resolve('win');
+            else ac.abort();
+          },
+          end: () => void calls.push('end'),
+          destroy: () => void calls.push('destroy'),
+        })),
+      );
+      expect(await abortName(runEntry(entry, { signal: ac.signal }))).toBe('AbortError');
+      expect(calls).toEqual(['end', 'destroy']);
+    });
+
+    it('aborts the intro wait and passes the signal to it', async () => {
+      const ac = new AbortController();
+      let seen: AbortSignal | undefined;
+      const calls: string[] = [];
+      const entry = makeEntry(game(() => ({ tick() {}, destroy: () => void calls.push('destroy') })));
+      const run = runEntry(entry, {
+        signal: ac.signal,
+        intro: (_v, s) => ((seen = s), new Promise(() => {})),
+      });
+      await new Promise((r) => setTimeout(r, 0));
+      ac.abort();
+      expect(await abortName(run)).toBe('AbortError');
+      expect(seen).toBe(ac.signal);
+      expect(calls).toEqual(['destroy']);
+    });
+
+    it('rejects immediately when already aborted, without loading the game', async () => {
+      const ac = new AbortController();
+      ac.abort();
+      let loaded = false;
+      const entry = { ...fixture('always-win'), load: async () => ((loaded = true), fixture('always-win').load()) };
+      expect(await abortName(runEntry(entry, { signal: ac.signal }))).toBe('AbortError');
+      expect(loaded).toBe(false);
+    });
+
+    it('does not turn a game error into an abort when the signal is untouched', async () => {
+      const ac = new AbortController();
+      expect(await runEntry(fixture('throws-in-create'), { signal: ac.signal })).toMatchObject({ kind: 'error' });
+    });
   });
 
   describe('errors', () => {

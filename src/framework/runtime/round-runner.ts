@@ -28,7 +28,8 @@ export interface RunRoundOptions {
   seed: number;
   clock: Clock;
   input: InputController;
-  intro?: (verb: string) => Promise<void>;
+  intro?: (verb: string, signal?: AbortSignal) => Promise<void>;
+  signal?: AbortSignal;
   stageScale?: () => number;
   reducedMotion?: boolean;
   loadImage?: (url: string, signal: AbortSignal) => Promise<HTMLImageElement>;
@@ -48,12 +49,25 @@ export function defaultLoadImage(url: string, signal: AbortSignal): Promise<HTML
   });
 }
 
+const abortError = () => new DOMException('Round aborted', 'AbortError');
+
 function withTimeout<T>(p: Promise<T>, ms: number, what: string): Promise<T> {
   let timer: ReturnType<typeof setTimeout>;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(() => reject(new Error(`${what} timed out after ${ms} ms`)), ms);
   });
   return Promise.race([p, timeout]).finally(() => clearTimeout(timer));
+}
+
+function raceAbort<T>(p: Promise<T>, signal?: AbortSignal): Promise<T> {
+  if (!signal) return p;
+  if (signal.aborted) return Promise.reject(abortError());
+  let onAbort!: () => void;
+  const aborted = new Promise<never>((_, reject) => {
+    onAbort = () => reject(abortError());
+    signal.addEventListener('abort', onAbort, { once: true });
+  });
+  return Promise.race([p, aborted]).finally(() => signal.removeEventListener('abort', onAbort));
 }
 
 export async function runRound(o: RunRoundOptions): Promise<RoundResult> {
@@ -73,23 +87,38 @@ export async function runRound(o: RunRoundOptions): Promise<RoundResult> {
     o.onPhase?.(p);
   };
 
+  const external = o.signal;
+  const cancelled = () => external?.aborted === true;
+  const preloadAbort = new AbortController();
+  const linkAbort = () => preloadAbort.abort();
+  external?.addEventListener('abort', linkAbort, { once: true });
+  const checkCancelled = () => {
+    if (cancelled()) throw abortError();
+  };
+
   root.dataset.game = entry.id;
   try {
+    checkCancelled();
     o.onPhase?.('load');
-    const game = await entry.load();
+    const game = await raceAbort(entry.load(), external);
+    checkCancelled();
     const rng = createRng(o.seed);
     enter('preload');
     let assets: unknown;
     if (game.preload) {
       const loadImage = o.loadImage ?? defaultLoadImage;
       const pctx: PreloadContext = {
-        loadImage: (url) => loadImage(url, abort.signal),
+        loadImage: (url) => loadImage(url, preloadAbort.signal),
         difficulty: o.difficulty,
         rng,
-        signal: abort.signal,
+        signal: preloadAbort.signal,
       };
-      assets = await withTimeout(game.preload(pctx), o.preloadTimeoutMs ?? PRELOAD_TIMEOUT_MS, 'preload');
+      assets = await raceAbort(
+        withTimeout(game.preload(pctx), o.preloadTimeoutMs ?? PRELOAD_TIMEOUT_MS, 'preload'),
+        external,
+      );
     }
+    checkCancelled();
 
     enter('create');
     const stage: Stage = {
@@ -121,7 +150,8 @@ export async function runRound(o: RunRoundOptions): Promise<RoundResult> {
       reducedMotion: o.reducedMotion ?? false,
     };
     instance = game.create(ctx, assets);
-    await o.intro?.(entry.manifest.verb);
+    if (o.intro) await raceAbort(o.intro(entry.manifest.verb, external), external);
+    checkCancelled();
 
     enter('start');
     o.input.reset();
@@ -130,6 +160,7 @@ export async function runRound(o: RunRoundOptions): Promise<RoundResult> {
     enter('play');
     let lastScale = scale();
     await o.clock.run((dt) => {
+      if (cancelled()) return false;
       elapsed += dt;
       const remaining = Math.max(0, timeLimitMs - elapsed);
       if (scale() !== lastScale) {
@@ -140,7 +171,8 @@ export async function runRound(o: RunRoundOptions): Promise<RoundResult> {
       o.input.endFrame();
       if (!resolved && remaining === 0) resolved = { outcome: entry.manifest.outcomeOnTimeout, via: 'timeout' };
       return !resolved;
-    });
+    }, external);
+    checkCancelled();
 
     const final = resolved as { outcome: Outcome; via: 'game' | 'timeout' } | null;
     if (!final) throw new Error('clock stopped before the round resolved');
@@ -150,11 +182,13 @@ export async function runRound(o: RunRoundOptions): Promise<RoundResult> {
     enter('settle');
     let settle = 0;
     await o.clock.run((dt) => {
+      if (cancelled()) return false;
       settle += dt;
       instance!.tick({ dt, elapsed, remaining: 0, phase: 'settle' });
       o.input.endFrame();
       return settle < settleMs;
-    });
+    }, external);
+    checkCancelled();
 
     enter('destroy');
     destroying = true;
@@ -168,8 +202,11 @@ export async function runRound(o: RunRoundOptions): Promise<RoundResult> {
         /* already failing */
       }
     }
+    if (cancelled()) throw abortError();
     return { kind: 'error', phase, error, elapsedMs: elapsed, gameId: entry.id };
   } finally {
+    external?.removeEventListener('abort', linkAbort);
+    preloadAbort.abort();
     abort.abort();
     root.replaceChildren();
   }

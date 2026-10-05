@@ -97,5 +97,50 @@ describe('InputController', () => {
       expect(i.api.pointer.inside).toBe(false);
       detach();
     });
+
+    it('captures the primary pointer on pointerdown', () => {
+      const { stageEl, detach } = setup();
+      const calls: number[] = [];
+      stageEl.setPointerCapture = (id: number) => void calls.push(id);
+      const down = new MouseEvent('pointerdown', { button: 0, bubbles: true });
+      Object.assign(down, { pointerId: 7, isPrimary: true });
+      stageEl.dispatchEvent(down);
+      expect(calls).toEqual([7]);
+      stageEl.setPointerCapture = () => {
+        throw new Error('bad pointer');
+      };
+      expect(() => stageEl.dispatchEvent(down)).not.toThrow();
+      detach();
+    });
+
+    it('releases held input on blur and pointercancel', () => {
+      const { i, stageEl, detach } = setup();
+      key('keydown', 'ArrowLeft');
+      stageEl.dispatchEvent(new MouseEvent('pointerdown', { clientX: 120, clientY: 70, button: 0, bubbles: true }));
+      expect(i.api.isDown('action')).toBe(true);
+      window.dispatchEvent(new Event('blur'));
+      expect(i.api.isDown('left')).toBe(false);
+      expect(i.api.isDown('action')).toBe(false);
+      expect(i.api.pointer.down).toBe(false);
+
+      stageEl.dispatchEvent(new MouseEvent('pointerdown', { clientX: 120, clientY: 70, button: 0, bubbles: true }));
+      expect(i.api.pointer.down).toBe(true);
+      stageEl.dispatchEvent(new Event('pointercancel'));
+      expect(i.api.pointer.down).toBe(false);
+      expect(i.api.isDown('action')).toBe(false);
+      detach();
+    });
+
+    it('detach removes every listener', () => {
+      const { i, stageEl, detach } = setup();
+      detach();
+      key('keydown', 'ArrowLeft');
+      stageEl.dispatchEvent(new MouseEvent('pointerdown', { clientX: 120, clientY: 70, button: 0, bubbles: true }));
+      expect(i.api.isDown('left')).toBe(false);
+      expect(i.api.pointer.down).toBe(false);
+      i.press('up');
+      window.dispatchEvent(new Event('blur'));
+      expect(i.api.isDown('up')).toBe(true);
+    });
   });
 });

@@ -105,6 +105,13 @@ export class InputController {
     }, opts);
     stageEl.addEventListener('pointerdown', (e) => {
       if (e.button !== 0) return;
+      if (e.isPrimary !== false) {
+        try {
+          stageEl.setPointerCapture?.(e.pointerId);
+        } catch {
+          /* synthetic or stale pointer */
+        }
+      }
       const p = toStage(e);
       this.setPointer(p.x, p.y, true, inStage(p));
     }, opts);
@@ -113,6 +120,8 @@ export class InputController {
       const p = toStage(e);
       this.setPointer(p.x, p.y, false, inStage(p));
     }, opts);
+    stageEl.addEventListener('pointercancel', () => this.reset(), opts);
+    window.addEventListener('blur', () => this.reset(), opts);
     stageEl.addEventListener('pointerleave', () => {
       this.ptr = { ...this.ptr, inside: false };
     }, opts);

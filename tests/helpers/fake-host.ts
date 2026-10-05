@@ -39,6 +39,7 @@ export interface RunEntryOptions {
   preloadTimeoutMs?: number;
   settleMs?: number;
   intro?: RunRoundOptions['intro'];
+  signal?: AbortSignal;
 }
 
 export async function runEntry(entry: RegistryEntry, o: RunEntryOptions = {}): Promise<RoundResult> {
@@ -46,11 +47,11 @@ export async function runEntry(entry: RegistryEntry, o: RunEntryOptions = {}): P
   const difficulty: Difficulty = { speed: o.speed ?? 1, level: o.level ?? 1, round: o.round ?? 0 };
   let frame = 0;
   const clock: Clock = {
-    run: (step) =>
+    run: (step, signal) =>
       host.clock.run((dt) => {
         o.script?.(frame++, host.input, host.root);
         return step(dt);
-      }),
+      }, signal),
   };
   try {
     return await runRound({
@@ -65,6 +66,7 @@ export async function runEntry(entry: RegistryEntry, o: RunEntryOptions = {}): P
       preloadTimeoutMs: o.preloadTimeoutMs,
       settleMs: o.settleMs,
       intro: o.intro,
+      signal: o.signal,
     });
   } finally {
     if (!o.host) host.dispose();
