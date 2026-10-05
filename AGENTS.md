@@ -53,6 +53,27 @@ gh pr merge --squash --delete-branch
 
 After merge, the `Deploy` workflow publishes the site in a few minutes. Your game appears in the gallery and in sessions with no other step.
 
+### Building a game from `microgames.md`
+
+When asked to build a game from `microgames.md`, use its spec block as the design and map it like this. The contract and checks in this file win over anything the catalogue says.
+
+| Spec field | Becomes |
+|---|---|
+| `id` | Directory name and `manifest.id` (check it isn't already in `src/games/`) |
+| `### NN. Title` heading | `manifest.title` |
+| `prompt` | `manifest.verb` |
+| `duration_s` | `manifest.baseDurationMs` (× 1000) |
+| `controls`, `control_hint` | `manifest.controls`, `manifest.controlHint` |
+| `outcome_on_timeout` | `manifest.outcomeOnTimeout` |
+| `levels` 1 / 2 / 3 | Content per `ctx.difficulty.level`; also scale all motion and rates by `ctx.difficulty.speed` |
+| `win` / `lose` | `ctx.resolve('win' \| 'lose')` as soon as the outcome is known |
+
+- Spec numbers are at speed 1.0, in logical pixels on the 960×720 stage.
+- The host flashes the prompt and shortens the timer as speed rises; don't implement either yourself.
+- If a condition is checked "when time runs out", evaluate it in the tick where `frame.remaining === 0` and call `ctx.resolve`. `outcome_on_timeout` only applies if you don't.
+- Show every success and failure state on screen during the settle phase (`frame.phase === 'settle'`); there is no audio.
+- Scaffold with the spec's values: `npm run new:game -- <id> --title "<Title>" --verb "<PROMPT>" --controls "<control_hint>"`.
+
 ## 3. Files in your directory
 
 ```

@@ -1,7 +1,7 @@
 import type { GameManifest } from '@arcade/sdk';
 
 const ID_RE = /^[a-z][a-z0-9-]{1,30}$/;
-const VERB_RE = /^[A-Z][A-Z !?]{0,11}$/;
+export const VERB_RE = /^[A-Z][A-Z !?]{0,11}$/;
 const TAG_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 export const CONTROL_HINT_RE = /^[^(),]+ \([^()]+\)(, [^(),]+ \([^()]+\))*$/;
 const CONTROLS = ['action', 'directions', 'pointer'];
