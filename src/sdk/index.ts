@@ -1,1 +1,2 @@
-export const CONTRACT_VERSION = 1 as const;
+export * from './types';
+export { clamp, lerp, aabbOverlap, type Rect } from './math';
