@@ -63,7 +63,8 @@
   .title {
     margin: 0;
     font-size: clamp(2.5rem, 8vw, 5rem);
-    line-height: 1;
+    line-height: 1.15;
+    padding-bottom: 0.08em;
     background: linear-gradient(90deg, #ffd166, #ff6b9d);
     -webkit-background-clip: text;
     background-clip: text;
