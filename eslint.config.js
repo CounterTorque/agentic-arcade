@@ -7,7 +7,7 @@ const gameFiles = ['src/games/**/*.{ts,js,svelte}'];
 const gameTestFiles = ['src/games/**/*.test.ts', 'src/games/**/*.e2e.ts'];
 
 export default tseslint.config(
-  { ignores: ['dist', 'playwright-report', 'test-results', 'coverage'] },
+  { ignores: ['dist', 'playwright-report', 'test-results', 'coverage', 'templates'] },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   ...svelte.configs['flat/recommended'],

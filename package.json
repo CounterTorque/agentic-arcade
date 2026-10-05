@@ -10,7 +10,12 @@
     "lint": "eslint .",
     "typecheck": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "check:games": "node scripts/check-games.mjs",
+    "check:budget": "node scripts/check-budget.mjs",
+    "new:game": "node scripts/new-game.mjs",
+    "verify:game": "node scripts/verify-game.mjs",
+    "verify": "npm run lint && npm run typecheck && npm run check:games && npm test && npm run build && npm run check:budget"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
