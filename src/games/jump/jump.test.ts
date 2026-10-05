@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import type { Difficulty } from '@arcade/sdk';
+import { depth } from '../../../tests/helpers/depth';
 import { createRng, makeGameEntry, runEntry } from '../../../tests/helpers/fake-host';
 import game from './index';
 import { AIRTIME_MS, PLAYER, createState, step, type JumpState } from './logic';
 import { manifest } from './manifest';
 
 const DT = 1000 / 60;
-const SPEEDS = [1, 1.5, 2, 2.5];
-const LEVELS = [1, 2, 3] as const;
-const SEEDS = Array.from({ length: 200 }, (_, i) => i + 1);
+const SPEEDS = depth([1, 2.5], [1, 1.5, 2, 2.5]);
+const LEVELS = depth([1, 3] as const, [1, 2, 3] as const);
+const SEEDS = Array.from({ length: depth(10, 200) }, (_, i) => i + 1);
 
 const bot = (s: JumpState) =>
   s.cars.some((c) => {
