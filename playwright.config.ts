@@ -1,8 +1,11 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const full = process.env.TEST_DEPTH === 'full';
+
 export default defineConfig({
   testDir: '.',
-  testMatch: ['tests/e2e/**/*.spec.ts', 'src/games/*/**/*.e2e.ts'],
+  testMatch: full ? ['tests/e2e/**/*.spec.ts', 'src/games/*/**/*.e2e.ts'] : ['tests/e2e/**/*.spec.ts'],
+  grepInvert: full ? undefined : /@full/,
   reporter: [['html', { open: 'never' }], ['list']],
   use: {
     baseURL: 'http://localhost:3457/agentic-arcade/',

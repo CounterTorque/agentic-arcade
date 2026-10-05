@@ -8,6 +8,7 @@ const ids = fs.existsSync(gamesDir)
       .readdirSync(gamesDir, { withFileTypes: true })
       .filter((d) => d.isDirectory() && fs.existsSync(`${gamesDir}/${d.name}/manifest.ts`))
       .map((d) => d.name)
+      .filter((id) => !process.env.GAME || id === process.env.GAME)
   : [];
 
 for (const id of ids) {

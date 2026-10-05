@@ -141,6 +141,7 @@ export default defineGame({
 
 ## 5. Conventions
 
+- **Heavy simulations (many seeds/speeds) must use `depth(smoke, full)` from `tests/helpers/depth`; keep a game's smoke-tier tests under ~1 s.** Game `*.e2e.ts` files run only in the full tier.
 - **Split logic from rendering.** Put the simulation in a pure, DOM-free module (`logic.ts`: `createState`, `step`) and drawing in `render.ts` or `.svelte`. Unit-test the logic headlessly, and drive full rounds with `runEntry` and `makeGameEntry` from `tests/helpers/fake-host` (the template's `game.test.ts` shows how). See `src/games/jump/` as the reference.
 - **Everything time-based uses `frame.dt` / `frame.elapsed`.** Everything random uses `ctx.rng`. With the same seed and inputs, your game must play out identically.
 - **Make it winnable and losable at every `speed` × `level`.** The best test is a bot that always wins across many seeds, plus idle play that loses (or the reverse for `outcomeOnTimeout:'win'` games where idling should fail).
@@ -172,7 +173,8 @@ export default defineGame({
 
 - [ ] Branch is `game/<id>`; the diff touches only `src/games/<id>/`.
 - [ ] `manifest.ts`, `index.ts`, `README.md`, and ≥ 1 `*.test.ts` exist.
-- [ ] `npm run verify:game -- <id>` passes locally: lint, typecheck, check:games, contract tests, unit tests, build, budget, and E2E (`tests/e2e/games.spec.ts` for your game plus your own `*.e2e.ts`) if browsers are installed.
+- [ ] `npm run verify:game -- <id>` passes locally: lint, typecheck, check:games, contract tests, unit tests, build, budget, and E2E (`tests/e2e/games.spec.ts` for your game; your own `*.e2e.ts` run only in the full tier) if browsers are installed.
+- [ ] If you changed difficulty or tuning: `npm run verify:game -- <id> --full` passes once before opening the PR.
 - [ ] Played in `npm run dev` at speed 1 and speed 2.5 (`#/play/<id>?speed=2.5&level=3`). It can be won and lost, and nothing goes wrong in the browser console.
 - [ ] Outcome logic is correct: `ctx.resolve` is called for the game-decided outcome, and `outcomeOnTimeout` matches the design.
 - [ ] `controlHint` accurately describes the inputs and action, e.g. `Space/Click (Jump)`.
@@ -186,7 +188,9 @@ export default defineGame({
 |---|---|
 | `npm run dev` | Dev server at `http://localhost:3456/agentic-arcade/` |
 | `npm run new:game -- <id> [--title T] [--verb V!] [--controls "Keys (Action)"]` | Scaffold a game from `templates/game/` |
-| `npm run verify:game -- <id>` | Full local gate for one game |
+| `npm run verify:game -- <id>` | Local gate for one game (smoke tier: fast) |
+| `npm run verify:game -- <id> --full` | Same gate at full depth (more seeds/speeds, plus your `*.e2e.ts`) |
+| `npm run test:full` / `npm run test:e2e:full` | Full-depth unit/contract and E2E suites (`TEST_DEPTH=full`) |
 | `GAME=<id> npx vitest run tests/contract` | Contract suite for one game only |
 | `npx vitest run src/games/<id>` | Your unit tests |
 | `npm run build && npm run check:budget` | Size check |

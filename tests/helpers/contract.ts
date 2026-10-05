@@ -2,6 +2,7 @@ import type { GameContext, GameInstance, InputAction, LifecyclePhase, MicroGame,
 import { validateManifest } from '../../src/framework/manifest-schema';
 import type { RegistryEntry } from '../../src/framework/registry';
 import { computeTimeLimit } from '../../src/framework/runtime/difficulty';
+import { depth } from './depth';
 import { createFakeHost, createRng, runEntry, type FrameScript } from './fake-host';
 
 export interface ContractFailure {
@@ -126,7 +127,7 @@ export async function checkGame(entry: RegistryEntry): Promise<ContractReport> {
   };
 
   await guard('idle', async () => {
-    for (let seed = 1; seed <= 5; seed++) {
+    for (const seed of depth([1, 2], [1, 2, 3, 4, 5])) {
       captured.ctx = undefined;
       const r = await runEntry(wrapped, { seed });
       if (r.kind === 'error') fail('idle', `seed ${seed}: ${describeResult(r)}`);
@@ -145,7 +146,7 @@ export async function checkGame(entry: RegistryEntry): Promise<ContractReport> {
   await guard('fuzz', async () => {
     for (const speed of [1, 2.5]) {
       for (const level of [1, 3] as const) {
-        for (let seed = 1; seed <= 10; seed++) {
+        for (const seed of depth([1], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10])) {
           const r = await runEntry(wrapped, { seed, speed, level, script: fuzzScript(seed) });
           if (r.kind === 'error') fail('fuzz', `seed ${seed} speed ${speed} level ${level}: ${describeResult(r)}`);
         }
@@ -172,7 +173,7 @@ export async function checkGame(entry: RegistryEntry): Promise<ContractReport> {
       });
       return { result: comparable(result), snapshot: canvas ? null : snapshot };
     };
-    for (const seed of [1, 2, 3]) {
+    for (const seed of depth([1], [1, 2, 3])) {
       const a = await play(seed);
       const b = await play(seed);
       if (JSON.stringify(a.result) !== JSON.stringify(b.result)) fail('determinism', `seed ${seed}: results differ between identical runs`);

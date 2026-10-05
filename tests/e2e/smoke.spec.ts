@@ -66,7 +66,15 @@ test('Esc pauses a round and resumes it', async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test('an idle session ends in game over and persists the result', async ({ page }) => {
+test('a session starts and plays its first round', async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.goto('./#/session?seed=1');
+  await expect(page.getByTestId('intermission')).toBeVisible();
+  await expect(page.getByTestId('flash')).toBeVisible({ timeout: 20_000 });
+  expect(errors).toEqual([]);
+});
+
+test('an idle session ends in game over and persists the result @full', async ({ page }) => {
   test.setTimeout(120_000);
   const errors = trackErrors(page);
   await page.goto('./#/session?seed=1');

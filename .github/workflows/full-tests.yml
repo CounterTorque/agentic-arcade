@@ -1,0 +1,21 @@
+name: Full tests
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+
+jobs:
+  full:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version-file: .nvmrc, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - run: npm run test:full
+      - run: npm run test:e2e:full
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with: { name: playwright-report, path: playwright-report, retention-days: 7 }

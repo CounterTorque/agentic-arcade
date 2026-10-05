@@ -4,9 +4,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const id = process.argv[2];
+const args = process.argv.slice(2);
+const full = args.includes('--full');
+const id = args.find((a) => !a.startsWith('--'));
 if (!id) {
-  console.error('usage: npm run verify:game -- <id>');
+  console.error('usage: npm run verify:game -- <id> [--full]');
   process.exit(2);
 }
 const win = process.platform === 'win32';
@@ -32,26 +34,27 @@ const steps = [
 
 for (const [name, cmd, args, env] of steps) {
   console.log(`\n=== ${name} ===`);
-  const r = spawnSync(cmd, args, { cwd: root, stdio: 'inherit', env: { ...process.env, ...env } });
+  const r = spawnSync(cmd, args, { cwd: root, stdio: 'inherit', env: { ...process.env, ...env, ...(full ? { TEST_DEPTH: 'full' } : {}) } });
   if (r.status !== 0) {
     console.error(`\nverify:game failed at step "${name}"`);
     process.exit(r.status ?? 1);
   }
 }
 
-console.log('\n=== e2e ===');
+console.log(`\n=== e2e (${full ? 'full' : 'smoke'}) ===`);
 const spec = 'tests/e2e/games.spec.ts';
-const gameE2e = fs.readdirSync(path.join(root, 'src', 'games', id)).filter((f) => f.endsWith('.e2e.ts'));
 if (!fs.existsSync(path.join(root, spec))) console.log(`skipped: ${spec} does not exist yet`);
 else if (!(await chromiumInstalled())) console.log('skipped: chromium not installed (run `npx playwright install chromium`)');
 else {
-  const runs = [[spec, '-g', id], ...gameE2e.map((f) => [`src/games/${id}/${f}`])];
-  for (const args of runs) {
-    const r = spawnSync(bin('npx'), ['playwright', 'test', ...args], { cwd: root, stdio: 'inherit' });
-    if (r.status !== 0) {
-      console.error('\nverify:game failed at step "e2e"');
-      process.exit(r.status ?? 1);
-    }
+  const files = full ? [spec, `src/games/${id}/`] : [spec];
+  const r = spawnSync(bin('npx'), ['playwright', 'test', ...files], {
+    cwd: root,
+    stdio: 'inherit',
+    env: { ...process.env, GAME: id, ...(full ? { TEST_DEPTH: 'full' } : {}) },
+  });
+  if (r.status !== 0) {
+    console.error('\nverify:game failed at step "e2e"');
+    process.exit(r.status ?? 1);
   }
 }
 console.log(`\nverify:game ${id}: all steps passed`);

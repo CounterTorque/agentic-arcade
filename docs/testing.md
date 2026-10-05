@@ -1,5 +1,20 @@
 # Testing
 
+## Tiers
+
+Default runs are the fast **smoke** tier; the **full** tier keeps the exhaustive coverage and is run on demand. `TEST_DEPTH=full` selects full; anything else is smoke. Tests choose their depth with `depth(smokeValue, fullValue)` from `tests/helpers/depth.ts` (importable from game tests).
+
+| | Smoke (default) | Full |
+|---|---|---|
+| Unit | `npm test` | `npm run test:full` |
+| Contract | idle seeds 1-2; fuzz seed 1 x speeds {1, 2.5} x levels {1, 3}; determinism seed 1 | idle seeds 1-5; fuzz seeds 1-10 (40 runs); determinism seeds 1-3 |
+| Jump | 10 seeds, speeds {1, 2.5}, levels {1, 3} | 200 seeds, 4 speeds, 3 levels |
+| E2E | `npm run test:e2e`: `tests/e2e/**/*.spec.ts` except tests tagged `@full` | `npm run test:e2e:full`: also `@full` tests and every `src/games/*/*.e2e.ts` |
+| One game | `npm run verify:game -- <id>` | `npm run verify:game -- <id> --full` |
+| Everything | `npm run verify` | `npm run verify:full` |
+
+Tag a slow Playwright test by putting `@full` in its title. CI (`ci.yml`, `deploy.yml`) runs smoke. The full tier runs in `.github/workflows/full-tests.yml`, which is `workflow_dispatch` only (Actions -> Full tests -> Run workflow). Run `verify:game -- <id> --full` once before a PR if you changed a game's difficulty or tuning.
+
 ## Layers
 
 | Layer | Location | Command | Purpose |
@@ -7,9 +22,9 @@
 | Unit (framework) | `tests/unit/` | `npm test` | rng, difficulty, input, clock, round-runner (every phase, abort), session, storage, manifest schema, registry, scripts, contract harness |
 | Unit (game) | `src/games/<id>/*.test.ts` | `npm test` | game logic and full rounds via `runEntry` |
 | Contract | `tests/contract/games.contract.test.ts` | `npm test` | runs against every game in `src/games/` automatically |
-| E2E smoke | `tests/e2e/smoke.spec.ts` | `npm run test:e2e` | lobby focus, route fallback, gallery vs registry, not-found, pause, stage fit, full idle session with persistence |
+| E2E smoke | `tests/e2e/smoke.spec.ts` | `npm run test:e2e` | lobby focus, route fallback, gallery vs registry, not-found, pause, stage fit, first round of a session; the full idle session to game over with persistence is `@full` |
 | E2E per game | `tests/e2e/games.spec.ts` | `npm run test:e2e` | one test per `src/games/<dir>` with a `manifest.ts`: opens `#/play/<id>?seed=1`, waits for `__ARCADE__.lastRound`, asserts `kind !== 'error'` and no page or console errors, attaches a mid-round screenshot |
-| E2E game-specific | `src/games/<id>/*.e2e.ts` | `npm run test:e2e` | optional, e.g. Jump idle -> `lose` |
+| E2E game-specific | `src/games/<id>/*.e2e.ts` | `npm run test:e2e:full` | full tier only; optional, e.g. Jump idle -> `lose` |
 
 Unit tests run in Vitest with jsdom and a no-op 2D canvas (`tests/setup/canvas-stub.ts`). E2E needs `npx playwright install chromium`; Playwright builds nothing, so run `npm run build` first (CI does). It serves `dist/` with `vite preview` on port 3457 at `/agentic-arcade/`.
 
@@ -27,9 +42,11 @@ npm run verify                                   # lint, typecheck, check:games,
 npm run verify:game -- <id>                      # the full gate for one game, including its E2E
 ```
 
-`verify:game` runs, in order: eslint on the game, typecheck, `check:games --only`, `GAME=<id> vitest run tests/contract src/games/<id>`, build, `check:budget --only`, then `games.spec.ts -g <id>` and each of the game's `*.e2e.ts` (skipped with a notice if Chromium is not installed).
+`verify:game` runs, in order: eslint on the game, typecheck, `check:games --only`, `GAME=<id> vitest run tests/contract src/games/<id>`, build, `check:budget --only`, then one Playwright run: `games.spec.ts` filtered to the game with `GAME=<id>` (plus the game's `*.e2e.ts` with `--full`). The e2e step is skipped with a notice if Chromium is not installed.
 
 ## What the contract suite checks
+
+Seed counts below are the full tier; smoke uses fewer (see Tiers).
 
 Implemented in `tests/helpers/contract.ts` (`checkGame`), driven by `ManualClock`, with an unattached `InputController`.
 
