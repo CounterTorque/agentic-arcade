@@ -17,7 +17,7 @@ These specs are written against the enforced game contract (`src/sdk/types.ts`, 
 
 | Field | Meaning |
 |---|---|
-| `id` | Stable kebab-case identifier (`/^[a-z][a-z0-9-]{1,30}$/`), unique, also the directory name and `manifest.id`. |
+| `id` | Stable kebab-case identifier (`/^[a-z][a-z0-9-]{1,30}$/`), unique, also the directory name and `manifest.id`. A directory with this id in `src/games/` must be this spec's implementation (same id and title); `tests/unit/microgames-spec.test.ts` checks this. |
 | `category` | Mechanic group. |
 | `input` | Descriptive controls the game requires (`button-press`, `button-hold`, `button-mash`, `pointer-click`, `pointer-drag`, `directional`, or a combination). |
 | `controls` | Flow list of `manifest.controls`, any of `action`, `directions`, `pointer`, in that order, no duplicates. Button press/hold/mash maps to `action`; pointer click/drag maps to `pointer`; directional maps to `directions`; combinations are the union. |

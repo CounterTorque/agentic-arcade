@@ -46,7 +46,13 @@ function parseSpecs(markdown: string): Spec[] {
 
 const specs = parseSpecs(fs.readFileSync(path.join(root, 'microgames.md'), 'utf8'));
 const gamesDir = path.join(root, 'src', 'games');
-const existing = new Set(fs.existsSync(gamesDir) ? fs.readdirSync(gamesDir) : []);
+const gameDirs = new Set(
+  fs.existsSync(gamesDir)
+    ? fs.readdirSync(gamesDir, { withFileTypes: true }).filter((d) => d.isDirectory()).map((d) => d.name)
+    : [],
+);
+const manifestField = (source: string, key: string) =>
+  new RegExp(`\\b${key}:\\s*['"]([^'"]+)['"]`).exec(source)?.[1];
 
 describe('microgames.md specs', () => {
   it('has exactly 50 specs', () => {
@@ -64,7 +70,16 @@ describe('microgames.md specs', () => {
       const f = s.fields;
       it('has a valid id and title', () => {
         expect(s.id, `${s.id}: id format`).toMatch(ID_RE);
-        expect(existing.has(s.id), `${s.id}: id collides with an existing src/games directory`).toBe(false);
+        if (gameDirs.has(s.id)) {
+          // An existing directory with a catalogue id is that spec's implementation.
+          const manifestPath = path.join(gamesDir, s.id, 'manifest.ts');
+          const source = fs.existsSync(manifestPath) ? fs.readFileSync(manifestPath, 'utf8') : '';
+          expect(manifestField(source, 'id') ?? '', `${s.id}: src/games/${s.id} exists but its manifest.ts id does not match the spec id`).toBe(s.id);
+          expect(
+            manifestField(source, 'title') ?? '',
+            `${s.id}: src/games/${s.id} exists but its manifest title does not match spec title "${s.title}" (an unrelated game is using a catalogue id)`,
+          ).toBe(s.title);
+        }
         expect(s.title.length, `${s.id}: title length`).toBeGreaterThanOrEqual(1);
         expect(s.title.length, `${s.id}: title "${s.title}" is longer than 24`).toBeLessThanOrEqual(24);
       });
