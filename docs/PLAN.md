@@ -979,7 +979,7 @@ jobs:
 
 `check-pr-scope.mjs` behavior:
 1. Lists changed files with `git diff --name-only <base>...HEAD`.
-2. Branch `game/<id>`: fails if any changed path is outside `src/games/<id>/`. Prints `games=<id>`.
+2. Branch `game/<id>` or `game/<id>/<topic>`: fails if any changed path is outside `src/games/<id>/`. Prints `games=<id>`.
 3. Branch `framework/*`, `docs/*`, `ci/*`, or `deps/*`: no path restriction. Intended for human review (not enforced, §10.6). Prints `games=`.
 4. Any other branch name: fails with a message pointing to `AGENTS.md`.
 

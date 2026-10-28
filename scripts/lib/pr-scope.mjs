@@ -2,7 +2,7 @@ import { ID_RE } from './games.mjs';
 
 /** @param {string} branch @param {string[]} files @returns {{ games: string, error?: string }} */
 export function evaluateScope(branch, files) {
-  const game = /^game\/(.+)$/.exec(branch);
+  const game = /^game\/([^/]+)(?:\/.+)?$/.exec(branch);
   if (game) {
     const id = game[1];
     if (!ID_RE.test(id)) return { games: '', error: `invalid game id "${id}" in branch "${branch}"` };
@@ -18,6 +18,6 @@ export function evaluateScope(branch, files) {
   if (/^(framework|docs|ci|deps)\/.+/.test(branch)) return { games: '' };
   return {
     games: '',
-    error: `branch "${branch}" must be named game/<id>, framework/<topic>, docs/<topic>, ci/<topic>, or deps/<topic>. See AGENTS.md.`,
+    error: `branch "${branch}" must be named game/<id>[/<topic>], framework/<topic>, docs/<topic>, ci/<topic>, or deps/<topic>. See AGENTS.md.`,
   };
 }

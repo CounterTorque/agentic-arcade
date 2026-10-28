@@ -26,6 +26,17 @@ describe('evaluateScope', () => {
     expect(evaluateScope('game/Bad_Id', []).error).toBeTruthy();
   });
 
+  it('accepts a game topic branch touching only its directory', () => {
+    expect(evaluateScope('game/my-game/fix-x', ['src/games/my-game/index.ts'])).toEqual({ games: 'my-game' });
+  });
+
+  it('rejects topic branches with files outside the game directory, an invalid id, or an empty topic', () => {
+    expect(evaluateScope('game/my-game/fix-x', ['src/games/other/index.ts']).error).toContain('src/games/other/index.ts');
+    expect(evaluateScope('game/my-game/fix-x', ['package.json']).error).toContain('package.json');
+    expect(evaluateScope('game/Bad_Id/x', []).error).toBeTruthy();
+    expect(evaluateScope('game/my-game/', []).error).toContain('AGENTS.md');
+  });
+
   it('has no path restriction on framework, docs, ci and deps branches', () => {
     for (const b of ['framework/x', 'docs/x', 'ci/x', 'deps/x']) expect(evaluateScope(b, ['package.json'])).toEqual({ games: '' });
   });
