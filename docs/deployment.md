@@ -38,7 +38,7 @@ The `pages` concurrency group does not cancel running deploys; GitHub keeps one 
 
 | Branch | Rule |
 |---|---|
-| `game/<id>` | may change only files under `src/games/<id>/` (`<id>` matches `^[a-z][a-z0-9-]{1,30}$`) |
+| `game/<id>`, `game/<id>/<topic>` | may change only files under `src/games/<id>/` (`<id>` matches `^[a-z][a-z0-9-]{1,30}$`; `<topic>` is any non-empty name) |
 | `framework/*`, `ci/*`, `docs/*`, `deps/*` | no path restriction |
 | anything else | the scope job fails with a message pointing to `AGENTS.md` |
 
@@ -46,7 +46,7 @@ The `pages` concurrency group does not cancel running deploys; GitHub keeps one 
 
 The only enforced rule on `main` is "a pull request is required to merge". Everything else is documented intent:
 
-- **Game PRs** (`game/<id>`): agents may squash-merge them with no human approval once `scope`, `verify` and `e2e` are green.
+- **Game PRs** (`game/<id>` or `game/<id>/<topic>`): agents may squash-merge them with no human approval once `scope`, `verify` and `e2e` are green.
 - **Framework, CI, docs, deps PRs:** intended for human review by @CounterTorque before merging; agents should not self-merge them.
 - Optionally mark `scope`, `verify`, `e2e` as required checks, **non-strict** (no "branch must be up to date"), so parallel game PRs do not force each other to rebase. The repository is user-owned, so GitHub's merge queue is not available and CI has no `merge_group` trigger.
 - Squash merge keeps one commit per game.

@@ -4,13 +4,13 @@ You are working in **Agentic Arcade**, a static, WarioWare-style micro-game host
 
 **Most tasks are "add a mini-game".** A game is one directory, `src/games/<id>/`. Merging it to `main` publishes it automatically. You never edit any other file to register it.
 
-If your task is *not* adding or changing a game (framework, CI, docs), use a `framework/<topic>`, `ci/<topic>`, `docs/<topic>`, or `deps/<topic>` branch (the `scope` job rejects any other branch name). Read `docs/architecture.md` first. Those PRs are for human review by @CounterTorque; do not self-merge them. Game PRs (`game/<id>`) you may merge yourself once CI is green.
+If your task is *not* adding or changing a game (framework, CI, docs), use a `framework/<topic>`, `ci/<topic>`, `docs/<topic>`, or `deps/<topic>` branch (the `scope` job rejects any other branch name). Read `docs/architecture.md` first. Those PRs are for human review by @CounterTorque; do not self-merge them. Game PRs (`game/<id>` or `game/<id>/<topic>`) you may merge yourself once CI is green.
 
 ---
 
 ## 1. The golden rule
 
-On a `game/<id>` branch, **every changed file must be under `src/games/<id>/`.** CI (`scope` job) rejects anything else, including `package.json`, `package-lock.json`, docs, README, tests outside your directory, and other games.
+On a `game/<id>` or `game/<id>/<topic>` branch, **every changed file must be under `src/games/<id>/`.** CI (`scope` job) rejects anything else, including `package.json`, `package-lock.json`, docs, README, tests outside your directory, and other games.
 
 If you believe you need a framework change (a new SDK helper, a new input), stop. Describe it in your PR description or task report instead of making it.
 
@@ -20,10 +20,10 @@ If you believe you need a framework change (a new SDK helper, a new input), stop
 # 0. Prerequisites: Node version from .nvmrc
 nvm use                      # or ensure `node -v` matches .nvmrc
 
-# 1. Pick a unique id (kebab-case, 2–31 chars, starts with a letter)
+# 1. New games only: pick a unique id (kebab-case, 2–31 chars, starts with a letter)
 git fetch origin
 ls src/games/                                  # must not already exist on main
-git ls-remote origin 'refs/heads/game/*'       # must not be claimed by an open branch
+git ls-remote origin 'refs/heads/game/*'       # new games only: must not be claimed by an open branch
 git switch -c game/<id> origin/main
 
 # 2. Install
@@ -52,6 +52,23 @@ gh pr merge --squash --delete-branch
 ```
 
 After merge, the `Deploy` workflow publishes the site in a few minutes. Your game appears in the gallery and in sessions with no other step.
+
+### Improving an existing game
+
+Use this when `src/games/<id>` is already on `main` and you are fixing or tuning it. Don't scaffold it again.
+
+```bash
+git fetch origin
+git switch -c game/<id>/<topic> origin/main   # e.g. game/jump/fix-hitbox
+# edit files under src/games/<id>/ only; keep manifest id and title unchanged
+npm run verify:game -- <id>
+git add src/games/<id>
+git commit -m "game(<id>): <summary>"
+git push -u origin game/<id>/<topic>
+gh pr create --title "game(<id>): <summary>" --body-file .github/pull_request_template.md
+```
+
+Squash-merge it once `scope`, `verify` and `e2e` are green, as for new games. Git can't hold `game/<id>` and `game/<id>/<topic>` at the same time, so if a `game/<id>` branch is still open or on origin, wait until it is merged and deleted before pushing a topic branch.
 
 ### Building a game from `microgames.md`
 
@@ -193,7 +210,7 @@ export default defineGame({
 
 ## 7. Definition of done
 
-- [ ] Branch is `game/<id>`; the diff touches only `src/games/<id>/`.
+- [ ] Branch is `game/<id>` or `game/<id>/<topic>`; the diff touches only `src/games/<id>/`.
 - [ ] `manifest.ts`, `index.ts`, `README.md`, and ≥ 1 `*.test.ts` exist.
 - [ ] `npm run verify:game -- <id>` passes locally: lint, typecheck, check:games, contract tests, unit tests, build, budget, and E2E (`tests/e2e/games.spec.ts` for your game; your own `*.e2e.ts` run only in the full tier) if browsers are installed.
 - [ ] If you changed difficulty or tuning: `npm run verify:game -- <id> --full` passes once before opening the PR.
