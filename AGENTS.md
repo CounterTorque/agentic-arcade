@@ -59,7 +59,7 @@ When asked to build a game from `microgames.md`, use its spec block as the desig
 
 | Spec field | Becomes |
 |---|---|
-| `id` | Directory name and `manifest.id` (check it isn't already in `src/games/`) |
+| `id` | Directory name and `manifest.id`. If `src/games/<id>` already exists on main (or `game/<id>` is claimed), the spec is already built: don't start it again. |
 | `### NN. Title` heading | `manifest.title` |
 | `prompt` | `manifest.verb` |
 | `duration_s` | `manifest.baseDurationMs` (× 1000) |
@@ -73,6 +73,7 @@ When asked to build a game from `microgames.md`, use its spec block as the desig
 - If a condition is checked "when time runs out", evaluate it in the tick where `frame.remaining === 0` and call `ctx.resolve`. `outcome_on_timeout` only applies if you don't.
 - Show every success and failure state on screen during the settle phase (`frame.phase === 'settle'`); there is no audio.
 - Scaffold with the spec's values: `npm run new:game -- <id> --title "<Title>" --verb "<PROMPT>" --controls "<control_hint>"`.
+- `tests/unit/microgames-spec.test.ts` checks that an existing `src/games/<spec id>` has that spec's `manifest.id` and `manifest.title`. A game that isn't from the catalogue must not use a catalogue id.
 
 ## 3. Files in your directory
 
