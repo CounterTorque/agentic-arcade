@@ -44,6 +44,31 @@ describe('evaluateScope', () => {
   it('rejects other branch names', () => {
     for (const b of ['main', 'feature/x', 'framework', 'game']) expect(evaluateScope(b, []).error).toContain('AGENTS.md');
   });
+
+  it('accepts forge branches touching only one game directory', () => {
+    expect(evaluateScope('forge/abc123', ['src/games/my-game/index.ts', 'src/games/my-game/a/b.png'])).toEqual({ games: 'my-game' });
+    expect(evaluateScope('forge/xyz-456-continue', ['src/games/trapeze/index.ts'])).toEqual({ games: 'trapeze' });
+  });
+
+  it('rejects forge branches with files outside the game directory', () => {
+    expect(evaluateScope('forge/abc', ['src/games/my-game/index.ts', 'package.json']).error).toContain('package.json');
+    expect(evaluateScope('forge/abc', ['src/games/my-game/index.ts', 'README.md']).error).toContain('AGENTS.md');
+  });
+
+  it('rejects forge branches touching multiple games', () => {
+    const result = evaluateScope('forge/abc', ['src/games/game-a/index.ts', 'src/games/game-b/index.ts']);
+    expect(result.error).toContain('multiple games');
+    expect(result.error).toContain('game-a');
+    expect(result.error).toContain('game-b');
+  });
+
+  it('rejects forge branches with no game files', () => {
+    expect(evaluateScope('forge/abc', ['package.json', 'README.md']).error).toContain('no game files');
+  });
+
+  it('rejects forge branches with invalid game ids', () => {
+    expect(evaluateScope('forge/abc', ['src/games/Bad_Id/index.ts']).error).toBeTruthy();
+  });
 });
 
 describe('import boundary logic', () => {
