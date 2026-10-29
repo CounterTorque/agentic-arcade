@@ -1,0 +1,18 @@
+<svg width="60" height="80" viewBox="0 0 60 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Head with happy expression -->
+  <circle cx="30" cy="15" r="12" fill="#FFD700" stroke="#000" stroke-width="2"/>
+  <circle cx="25" cy="13" r="2" fill="#000"/>
+  <circle cx="35" cy="13" r="2" fill="#000"/>
+  <path d="M 22 18 Q 30 22 38 18" stroke="#000" stroke-width="2" fill="none"/>
+  
+  <!-- Body -->
+  <ellipse cx="30" cy="40" rx="12" ry="18" fill="#FF6B6B" stroke="#000" stroke-width="2"/>
+  
+  <!-- Arms raised in victory -->
+  <line x1="18" y1="32" x2="10" y2="20" stroke="#FFD700" stroke-width="4" stroke-linecap="round"/>
+  <line x1="42" y1="32" x2="50" y2="20" stroke="#FFD700" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Legs -->
+  <line x1="25" y1="55" x2="20" y2="75" stroke="#4169E1" stroke-width="4" stroke-linecap="round"/>
+  <line x1="35" y1="55" x2="40" y2="75" stroke="#4169E1" stroke-width="4" stroke-linecap="round"/>
+</svg>
