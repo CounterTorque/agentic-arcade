@@ -157,7 +157,7 @@ export function draw(g: Ctx, state: State, settleTime: number, reducedMotion: bo
   const caught = state.verdict === 'caught';
   const moving = state.mouse !== 'home' && state.position > 0 && state.position < DISTANCE;
   drawMouse(g, mouseX, caught, moving && !reducedMotion, state.trapTime, state.verdict === 'timeout');
-  if (state.cheese && !caught) drawCheese(g, mouseX + 25, 423);
+  if (state.cheese) drawCheese(g, mouseX + (caught ? 55 : 25), caught ? 465 : 423);
 
   if (state.trap === 'warning') {
     g.fillStyle = '#c3352c';
