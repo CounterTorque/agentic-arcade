@@ -6,8 +6,6 @@ You are working in **Agentic Arcade**, a static, WarioWare-style micro-game host
 
 If your task is *not* adding or changing a game (framework, CI, docs), use a `framework/<topic>`, `ci/<topic>`, `docs/<topic>`, or `deps/<topic>` branch (the `scope` job rejects any other branch name). Read `docs/architecture.md` first. Those PRs are for human review by @CounterTorque; do not self-merge them. Game PRs (`game/<id>` or `game/<id>/<topic>`) you may merge yourself once CI is green.
 
-**Note:** `forge/<topic>` branches are also allowed for agent-driven multi-task work that may span multiple areas. These follow the same review rules as framework/ci/docs/deps branches.
-
 ---
 
 ## 1. The golden rule
