@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="20" viewBox="0 0 80 20">
+  <!-- Trapeze bar -->
+  <rect x="5" y="8" width="70" height="4" rx="2" fill="#8b4513" stroke="#1d3557" stroke-width="1"/>
+  <!-- Rope left -->
+  <line x1="15" y1="8" x2="15" y2="0" stroke="#1d3557" stroke-width="2" stroke-linecap="round"/>
+  <!-- Rope right -->
+  <line x1="65" y1="8" x2="65" y2="0" stroke="#1d3557" stroke-width="2" stroke-linecap="round"/>
+</svg>
