@@ -5,10 +5,10 @@ export const manifest = defineManifest({
   id: 'bite',
   title: 'Bite!',
   verb: 'HOOK IT!',
-  description: 'Press the action key before time runs out.',
+  description: 'Reel in only when the bobber truly plunges. Fake nibbles empty your hook.',
   controls: ['action'],
   controlHint: 'Space/Click (Hook)',
-  baseDurationMs: 4000,
+  baseDurationMs: 5000,
   outcomeOnTimeout: 'lose',
   tags: ['reflex'],
 });
