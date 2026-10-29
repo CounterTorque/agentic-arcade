@@ -37,8 +37,8 @@ describe('evaluateScope', () => {
     expect(evaluateScope('game/my-game/', []).error).toContain('AGENTS.md');
   });
 
-  it('has no path restriction on framework, docs, ci and deps branches', () => {
-    for (const b of ['framework/x', 'docs/x', 'ci/x', 'deps/x']) expect(evaluateScope(b, ['package.json'])).toEqual({ games: '' });
+  it('has no path restriction on framework, docs, ci, deps and forge branches', () => {
+    for (const b of ['framework/x', 'docs/x', 'ci/x', 'deps/x', 'forge/x']) expect(evaluateScope(b, ['package.json'])).toEqual({ games: '' });
   });
 
   it('rejects other branch names', () => {

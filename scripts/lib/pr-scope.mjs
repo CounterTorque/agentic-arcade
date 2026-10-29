@@ -15,9 +15,9 @@ export function evaluateScope(branch, files) {
       };
     return { games: id };
   }
-  if (/^(framework|docs|ci|deps)\/.+/.test(branch)) return { games: '' };
+  if (/^(framework|docs|ci|deps|forge)\/.+/.test(branch)) return { games: '' };
   return {
     games: '',
-    error: `branch "${branch}" must be named game/<id>[/<topic>], framework/<topic>, docs/<topic>, ci/<topic>, or deps/<topic>. See AGENTS.md.`,
+    error: `branch "${branch}" must be named game/<id>[/<topic>], framework/<topic>, docs/<topic>, ci/<topic>, deps/<topic>, or forge/<topic>. See AGENTS.md.`,
   };
 }
