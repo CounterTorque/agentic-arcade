@@ -29,6 +29,8 @@ npx playwright install chromium   # once
 npm run build && npm run test:e2e
 ```
 
+Documentation-only changes should keep the diff focused: touch only the files the change needs, and leave unrelated code and formatting alone.
+
 ## Documentation
 
 - [AGENTS.md](AGENTS.md): how to add a game (start here).
