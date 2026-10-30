@@ -39,3 +39,7 @@ npm run build && npm run test:e2e
 - [docs/storage.md](docs/storage.md): save schema and migrations.
 - [docs/adr/](docs/adr/): architecture decision records.
 - [docs/PLAN.md](docs/PLAN.md): the original implementation plan.
+
+## Contributing
+
+For documentation-only contributions, keep changes focused and easy to review.
