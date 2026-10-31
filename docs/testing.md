@@ -9,11 +9,11 @@ Default runs are the fast **smoke** tier; the **full** tier keeps the exhaustive
 | Unit | `npm test` | `npm run test:full` |
 | Contract | idle seeds 1-2; fuzz seed 1 x speeds {1, 2.5} x levels {1, 3}; determinism seed 1 | idle seeds 1-5; fuzz seeds 1-10 (40 runs); determinism seeds 1-3 |
 | Jump | 10 seeds, speeds {1, 2.5}, levels {1, 3} | 200 seeds, 4 speeds, 3 levels |
-| E2E | `npm run test:e2e`: `tests/e2e/**/*.spec.ts` except tests tagged `@full` | `npm run test:e2e:full`: also `@full` tests and every `src/games/*/*.e2e.ts` |
+| E2E | `npm run test:e2e`: smoke specs except `@full`, plus a round of `jump` and games named in `GAMES` | `npm run test:e2e:full`: a round of every game, `@full` tests and every `src/games/*/*.e2e.ts` |
 | One game | `npm run verify:game -- <id>` | `npm run verify:game -- <id> --full` |
 | Everything | `npm run verify` | `npm run verify:full` |
 
-Tag a slow Playwright test by putting `@full` in its title. CI (`ci.yml`, `deploy.yml`) runs smoke. The full tier runs in `.github/workflows/full-tests.yml`, which is `workflow_dispatch` only (Actions -> Full tests -> Run workflow). Run `verify:game -- <id> --full` once before a PR if you changed a game's difficulty or tuning.
+Tag a slow Playwright test by putting `@full` in its title. CI runs smoke E2E and sets `GAMES` to the game ID for game PRs; deployment runs smoke unit and contract tests. Locally, `GAMES` accepts a comma-separated list of additional game IDs. `GAME` selects only one game for per-game E2E, even in the full tier. The full tier runs in `.github/workflows/full-tests.yml`, which is `workflow_dispatch` only (Actions -> Full tests -> Run workflow). Run `verify:game -- <id> --full` once before a PR if you changed a game's difficulty or tuning.
 
 ## Layers
 
@@ -23,7 +23,7 @@ Tag a slow Playwright test by putting `@full` in its title. CI (`ci.yml`, `deplo
 | Unit (game) | `src/games/<id>/*.test.ts` | `npm test` | game logic and full rounds via `runEntry` |
 | Contract | `tests/contract/games.contract.test.ts` | `npm test` | runs against every game in `src/games/` automatically |
 | E2E smoke | `tests/e2e/smoke.spec.ts` | `npm run test:e2e` | lobby focus, route fallback, gallery vs registry, not-found, pause, stage fit, first round of a session; the full idle session to game over with persistence is `@full` |
-| E2E per game | `tests/e2e/games.spec.ts` | `npm run test:e2e` | one test per `src/games/<dir>` with a `manifest.ts`: opens `#/play/<id>?seed=1`, waits for `__ARCADE__.lastRound`, asserts `kind !== 'error'` and no page or console errors, attaches a mid-round screenshot |
+| E2E per game | `tests/e2e/games.spec.ts` | `npm run test:e2e` / `npm run test:e2e:full` | one test per selected game (`jump` and `GAMES` in smoke, every game in full): opens `#/play/<id>?seed=1`, waits for `__ARCADE__.lastRound`, asserts `kind !== 'error'` and no page or console errors, attaches a mid-round screenshot |
 | E2E game-specific | `src/games/<id>/*.e2e.ts` | `npm run test:e2e:full` | full tier only; optional, e.g. Jump idle -> `lose` |
 
 The `microgames.md` catalogue test (`tests/unit/microgames-spec.test.ts`) checks that there are 50 specs, that ids and titles are unique, that each spec's fields are valid, and that an existing `src/games/<id>` with a catalogue id has the spec's `manifest.id` and `manifest.title`.
@@ -38,8 +38,11 @@ Ports: `npm run dev` and `npm run preview` use 3456; Playwright starts its own p
 npm test                                         # all unit + contract tests
 npx vitest run src/games/<id>                    # one game's unit tests
 GAME=<id> npx vitest run tests/contract          # contract suite for one game
-npm run test:e2e                                 # all E2E (after npm run build)
-npx playwright test tests/e2e/games.spec.ts -g <id>
+npm run test:e2e                                 # smoke E2E (after npm run build)
+GAMES=a,b npm run test:e2e                       # include additional games in smoke
+npm run test:e2e:full                            # all E2E
+TEST_DEPTH=full npx playwright test tests/e2e/games.spec.ts  # every game's round
+GAME=<id> npx playwright test tests/e2e/games.spec.ts        # one game's round
 npm run verify                                   # lint, typecheck, check:games, tests, build, check:budget
 npm run verify:game -- <id>                      # the full gate for one game, including its E2E
 ```
