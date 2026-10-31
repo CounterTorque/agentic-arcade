@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import { expect, test } from '@playwright/test';
-import { trackErrors } from './helpers';
+import { selectE2eGames, trackErrors } from './helpers';
 
 const gamesDir = 'src/games';
 const ids = fs.existsSync(gamesDir)
@@ -8,10 +8,9 @@ const ids = fs.existsSync(gamesDir)
       .readdirSync(gamesDir, { withFileTypes: true })
       .filter((d) => d.isDirectory() && fs.existsSync(`${gamesDir}/${d.name}/manifest.ts`))
       .map((d) => d.name)
-      .filter((id) => !process.env.GAME || id === process.env.GAME)
   : [];
 
-for (const id of ids) {
+for (const id of selectE2eGames(ids, process.env)) {
   test(`game ${id} plays a round without errors`, async ({ page }, testInfo) => {
     test.setTimeout(45_000);
     const errors = trackErrors(page);
