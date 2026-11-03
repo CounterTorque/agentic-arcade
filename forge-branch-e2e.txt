@@ -1,1 +1,2 @@
 Existing branch session fixture.
+External source push.
