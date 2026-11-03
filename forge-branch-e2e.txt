@@ -1,1 +1,2 @@
 Existing branch session fixture.
+Verified existing-branch edit.
