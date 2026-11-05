@@ -3,9 +3,9 @@ import type { Outcome, Rng } from '@arcade/sdk';
 export type Level = 1 | 2 | 3;
 
 const LEVELS = {
-  1: { cols: 4, rows: 4, lit: 6, relights: 0 },
-  2: { cols: 4, rows: 5, lit: 10, relights: 1 },
-  3: { cols: 5, rows: 7, lit: 15, relights: 3 },
+  1: { cols: 4, rows: 4, lit: 2, relights: 0 },
+  2: { cols: 4, rows: 5, lit: 4, relights: 1 },
+  3: { cols: 5, rows: 7, lit: 6, relights: 3 },
 } satisfies Record<Level, { cols: number; rows: number; lit: number; relights: number }>;
 
 interface Relight {

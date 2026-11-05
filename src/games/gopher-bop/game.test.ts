@@ -54,7 +54,7 @@ describe(manifest.id, () => {
       const result = await runEntry(entry, { host, script: (frame, input) => {
         const pop = frame === 99
           ? state.pops.filter((p) => p.kind === 'gopher').at(-1)
-          : state.hits < 4 && frame % 2 === 0
+          : state.hits < 2 && frame % 2 === 0
             ? state.pops.find((p) => p.kind === 'gopher' && active(p, state.elapsed))
             : undefined;
         let click = null;

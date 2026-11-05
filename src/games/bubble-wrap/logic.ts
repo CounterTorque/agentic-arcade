@@ -3,9 +3,9 @@ import type { Outcome, Rng } from '@arcade/sdk';
 export type Level = 1 | 2 | 3;
 
 const LEVELS = {
-  1: { count: 12, cols: 4, scroll: 20 },
-  2: { count: 20, cols: 5, scroll: 40 },
-  3: { count: 30, cols: 6, scroll: 60 },
+  1: { count: 4, cols: 2, scroll: 20 },
+  2: { count: 6, cols: 3, scroll: 40 },
+  3: { count: 8, cols: 4, scroll: 60 },
 } satisfies Record<Level, { count: number; cols: number; scroll: number }>;
 
 export const RADIUS = 38;

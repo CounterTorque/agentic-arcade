@@ -4,7 +4,7 @@ import { bubblePos, createState, hitTest, levelParams, RADIUS, step } from './lo
 
 describe('Bubble Wrap logic', () => {
   it('uses the specified counts and scroll rates with deterministic layouts', () => {
-    for (const [level, count, scroll] of [[1, 12, 20], [2, 20, 40], [3, 30, 60]] as const) {
+    for (const [level, count, scroll] of [[1, 4, 20], [2, 6, 40], [3, 8, 60]] as const) {
       expect(levelParams(level)).toMatchObject({ count, scroll });
       const state = createState(level, createRng(42), 2000, 2.5);
       expect(state).toEqual(createState(level, createRng(42), 2000, 2.5));

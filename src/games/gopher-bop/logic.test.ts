@@ -5,9 +5,9 @@ import { active, createState, holeRect, levelParams, popOffset, step } from './l
 describe('Gopher Bop logic', () => {
   it('uses the specified level parameters', () => {
     expect([1, 2, 3].map((level) => levelParams(level as 1 | 2 | 3))).toEqual([
-      { cols: 3, rows: 2, hits: 5, upMs: 900 },
-      { cols: 3, rows: 3, hits: 6, upMs: 650 },
-      { cols: 4, rows: 3, hits: 7, upMs: 450 },
+      { cols: 3, rows: 2, hits: 3, upMs: 900 },
+      { cols: 3, rows: 3, hits: 4, upMs: 650 },
+      { cols: 4, rows: 3, hits: 5, upMs: 450 },
     ]);
   });
 
@@ -36,7 +36,7 @@ describe('Gopher Bop logic', () => {
     const state = createState(1, createRng(1), 5000, 1);
     step(state, 0, { x: 0, y: 0 });
     expect(state.hits).toBe(0);
-    for (const pop of state.pops.slice(0, 5)) {
+    for (const pop of state.pops.slice(0, 3)) {
       state.elapsed = (pop.start + pop.end) / 2;
       const { x, y } = holeRect(1, pop.hole);
       const click = { x, y: y - 35 + popOffset(pop, state.elapsed) };
@@ -44,7 +44,7 @@ describe('Gopher Bop logic', () => {
       step(state, 0, click);
       step(state, 0, click);
     }
-    expect(state.hits).toBe(5);
+    expect(state.hits).toBe(3);
     expect(state.verdict).toBe('win');
   });
 
