@@ -4,7 +4,7 @@ Click every bubble on the drifting sheet before one escapes off the right edge o
 
 ## Difficulty
 
-Levels 1, 2 and 3 have 12, 20 and 30 bubbles, scrolling at 20, 40 and 60 pixels per second respectively. Scroll speed is multiplied by the host's speed, which also shortens the round.
+Levels 1, 2 and 3 have 4, 6 and 8 bubbles, scrolling at 20, 40 and 60 pixels per second respectively. Scroll speed is multiplied by the host's speed, which also shortens the round.
 
 ## Tuning
 

@@ -56,7 +56,7 @@ describe(manifest.id, () => {
     const host = createFakeHost({ frameMs: 50 });
     try {
       expect(await runEntry(entry, { host, script: (frame, input) => {
-        const target = frame < 10 && frame % 2 === 0 ? targets[frame / 2] : frame === 99 ? targets[5] : undefined;
+        const target = frame < 2 && frame % 2 === 0 ? targets[frame / 2] : frame === 99 ? targets[1] : undefined;
         if (target !== undefined) {
           const rect = windowRect(1, target);
           input.setPointer(rect.x + 40, rect.y + 30, true);

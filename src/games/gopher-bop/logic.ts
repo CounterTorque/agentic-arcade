@@ -4,9 +4,9 @@ export type Level = 1 | 2 | 3;
 export type Critter = 'gopher' | 'rabbit';
 
 const LEVELS = {
-  1: { cols: 3, rows: 2, hits: 5, upMs: 900 },
-  2: { cols: 3, rows: 3, hits: 6, upMs: 650 },
-  3: { cols: 4, rows: 3, hits: 7, upMs: 450 },
+  1: { cols: 3, rows: 2, hits: 3, upMs: 900 },
+  2: { cols: 3, rows: 3, hits: 4, upMs: 650 },
+  3: { cols: 4, rows: 3, hits: 5, upMs: 450 },
 } satisfies Record<Level, { cols: number; rows: number; hits: number; upMs: number }>;
 
 export interface Pop {
