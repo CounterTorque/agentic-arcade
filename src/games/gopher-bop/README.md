@@ -4,7 +4,7 @@ Click the brown gophers as they pop out of their holes. Reach the hit target bef
 
 ## Difficulty
 
-Level 1 has six holes, five hits to collect, and gophers visible for 900 ms. Level 2 has nine holes, six hits, 650 ms appearances, and one rabbit. Level 3 has twelve holes, seven hits, 450 ms appearances, and two or three rabbits. Appearance durations and the round timer shrink with speed.
+Level 1 has six holes, three hits to collect, and gophers visible for 900 ms. Level 2 has nine holes, four hits, 650 ms appearances, and one rabbit. Level 3 has twelve holes, five hits, 450 ms appearances, and two or three rabbits. Appearance durations and the round timer shrink with speed.
 
 ## Tuning
 

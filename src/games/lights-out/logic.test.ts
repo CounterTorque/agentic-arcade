@@ -8,7 +8,7 @@ describe('Lights Out logic', () => {
       const state = createState(level, createRng(13), 5000);
       const params = levelParams(level);
       expect(state.lit).toHaveLength(params.cols * params.rows);
-      expect(litCount(state)).toBe([6, 10, 15][level - 1]);
+      expect(litCount(state)).toBe([2, 4, 6][level - 1]);
       expect(state.pendingRelights).toHaveLength([0, 1, 3][level - 1]);
       for (const relight of state.pendingRelights) {
         expect(relight.at).toBeGreaterThanOrEqual(1500);
@@ -34,10 +34,10 @@ describe('Lights Out logic', () => {
     };
     step(state, 0, rng, point(dark));
     step(state, 0, rng, { x: 0, y: 0 });
-    expect(litCount(state)).toBe(6);
+    expect(litCount(state)).toBe(2);
     step(state, 0, rng, point(lit));
     expect(state.lit[lit]).toBe(false);
-    expect(litCount(state)).toBe(5);
+    expect(litCount(state)).toBe(1);
     expect(evaluate(state)).toBe('lose');
     state.lit.fill(false);
     expect(evaluate(state)).toBe('win');
