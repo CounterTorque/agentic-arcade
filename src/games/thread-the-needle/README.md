@@ -2,27 +2,20 @@
 
 ## Concept
 
-A needle sways side to side in the middle of the screen, with a strand of thread hanging above it. Press the action key to drop the thread. It has to slide through the eye of the needle. If it strikes the metal it frays, and the round is lost.
+An oversized sewing needle bobs up and down beside a strand of thread. Shoot the thread from the left into the eye and it threads itself. Hitting the metal frays the thread; missing the needle also loses.
 
 ## Controls
 
-- `action` (Space / Enter / Z / J / left click): drop the thread. Only the first press counts.
+- `action` (Space / Enter / Z / J / left click): shoot the thread. Only the first press counts.
 
 ## Difficulty scaling
 
-- `speed`: the needle sways faster (its angular rate is multiplied by speed), and the thread falls faster. Fall time is about 0.34 s at speed 1.0 and shrinks in proportion to speed.
-- `level`: sway period and eye width follow the spec:
-  - 1: period 1.6 s, eye 24 px
-  - 2: period 1.2 s, eye 18 px
-  - 3: period 0.8 s, eye 12 px
+- `speed`: the needle bobs faster and the thread travels faster. The 1.4 s bob period and approximately 0.16 s travel time at speed 1 shrink in proportion to speed.
+- `level`: the eye height shrinks from 56 px at level 1 to 38 px at level 2 and 24 px at level 3. The bob period is the same at every level.
 
 ## Tuning
 
-- `SWAY_AMPLITUDE` (220 px): how far the needle travels either side of centre.
-- `FALL_PX_PER_S` (900) and the `THREAD_START_Y` / `EYE_Y` gap: set the fall time, so the player has to anticipate where the needle will be.
-- `THREAD_WIDTH` (4 px): the usable gap in the eye is `eyeWidth − THREAD_WIDTH`, so the thread passes if its centre is within half of that gap of the eye's centre.
-- The thread is judged at the moment its tip reaches the eye line. If the timer runs out while it is still falling, it is judged where it is.
-
-## Known issues
-
-None yet.
+- `BOB_AMPLITUDE` (180 px) and `BOB_PERIOD_S` (1.4 s) set the needle's movement.
+- `TRAVEL_PX_PER_S` (700) and the 110 px gap from `THREAD_START_X` to the needle face set the travel time.
+- `THREAD_WIDTH` (6 px): the usable gap is `eyeHeight − THREAD_WIDTH`, so the thread passes if its centre is within half that gap of the eye's centre.
+- The thread is judged when its tip reaches the needle face. If the timer runs out while it is still travelling, it is judged at the needle's current position.
