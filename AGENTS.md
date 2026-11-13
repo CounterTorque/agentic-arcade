@@ -233,7 +233,7 @@ export default defineGame({
 | `GAME=<id> npx vitest run tests/contract` | Contract suite for one game only |
 | `npx vitest run src/games/<id>` | Your unit tests |
 | `npm run build && npm run check:budget` | Size check |
-| `npx playwright test tests/e2e/games.spec.ts -g <id>` | Browser smoke test for your game (`npx playwright install chromium` first) |
+| `GAME=<id> npx playwright test tests/e2e/games.spec.ts` | Browser smoke test for your game (`npx playwright install chromium` first) |
 | `npm run verify` | Full repo gate (framework work) |
 
 ## 9. Local servers and processes

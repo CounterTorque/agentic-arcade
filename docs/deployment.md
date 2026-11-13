@@ -23,7 +23,7 @@ Pages serves a project site under `/agentic-arcade/`, so `vite.config.ts` sets `
 |---|---|
 | `scope` | pull requests only; checks out with full history and runs `node scripts/check-pr-scope.mjs "origin/$BASE_REF" "$HEAD_REF"`. Branch names arrive through `env`, never interpolated into the script. Outputs `games=<id or empty>` |
 | `verify` | `npm ci`, lint, typecheck, `check:games`, `npm test`, build, `check:budget`, uploads `dist` (7 days) |
-| `e2e` | needs `verify`; `npm ci`, installs Chromium, builds, runs `npm run test:e2e`, uploads `playwright-report` (7 days, always) |
+| `e2e` | needs `scope` and `verify`; `npm ci`, installs Chromium, builds, runs the smoke E2E subset with the scope output as `GAMES`, uploads `playwright-report` (7 days, always) |
 
 Runs for the same PR cancel each other (`concurrency`). The Node version comes from `.nvmrc`. Actions are pinned to major tags: `checkout@v7`, `setup-node@v7`, `upload-artifact@v7`.
 

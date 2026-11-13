@@ -307,9 +307,9 @@ outcome_on_timeout: lose
 win: "Required number of gophers hit before time runs out."
 lose: "A rabbit is clicked, or the hit target is not reached in time."
 levels:
-  1: "6 holes; 5 hits needed; gophers up 900ms; no rabbits."
-  2: "9 holes; 6 hits; up 650ms; 1 rabbit."
-  3: "12 holes; 7 hits; up 450ms; 2-3 rabbits."
+  1: "6 holes; 3 hits needed; gophers up 900ms; no rabbits."
+  2: "9 holes; 4 hits; up 650ms; 1 rabbit."
+  3: "12 holes; 5 hits; up 450ms; 2-3 rabbits."
 ```
 
 ### 14. Lights Out
@@ -328,9 +328,9 @@ outcome_on_timeout: lose
 win: "Every window is dark on the final tick (evaluated when time runs out)."
 lose: "Any window still lit on the final tick."
 levels:
-  1: "6 lit windows; no relights."
-  2: "10 lit windows; 1 relight."
-  3: "15 lit windows on a taller building; 3 relights."
+  1: "2 lit windows; no relights."
+  2: "4 lit windows; 1 relight."
+  3: "6 lit windows on a taller building; 3 relights."
 ```
 
 ### 15. Odd One Out
@@ -370,9 +370,9 @@ outcome_on_timeout: lose
 win: "All bubbles popped before any scroll off-screen."
 lose: "Any unpopped bubble leaves the screen edge."
 levels:
-  1: "12 bubbles; scroll 20px/s."
-  2: "20 bubbles; scroll 40px/s."
-  3: "30 bubbles; scroll 60px/s."
+  1: "4 bubbles; scroll 20px/s."
+  2: "6 bubbles; scroll 40px/s."
+  3: "8 bubbles; scroll 60px/s."
 ```
 
 ### 17. Say Cheese
